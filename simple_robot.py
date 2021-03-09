@@ -39,3 +39,9 @@ class SimpleRobot():
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.phi = phi
+        
+    def move(self, linear_speed, angular_speed, timestep):
+        self.pos_x += linear_speed*np.cos(self.phi)*timestep
+        self.pos_y += linear_speed*np.sin(self.phi)*timestep
+        self.phi   += angular_speed*timestep
+        return self.pos_x, self.pos_y, self.phi

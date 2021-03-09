@@ -16,3 +16,29 @@ class testing_robot(unittest.TestCase):
         #testing if the rotation does not add more components
         self.assertEquals(len(self.robot.init_robot_body), 4)
         self.assertEquals(len(self.robot.obstacle_map), self.robot.n_direction)
+        
+    def test_move(self):
+        #testing if the robot moves in x-axis
+        self.robot.set_robot_position(0., 0., 0.)
+        for i in range(5):
+            self.robot.move(1.0, 0., 0.1)
+            self.assertGreater(self.robot.pos_x, 0., 'robot does not move positively in x-axis')
+        self.robot.set_robot_position(0., 0., 0.)
+        for i in range(5):
+            self.robot.move(-1.0, 0., 0.1)
+            self.assertLess(self.robot.pos_x, 0., 'robot does not move negatively in x-axis')
+        #testing if the robot moves in y-axis
+        self.robot.set_robot_position(0., 0., np.pi/2)
+        for i in range(5):
+            self.robot.move(1.0, 0., 0.1)
+            self.assertGreater(self.robot.pos_y, 0., 'robot does not move positively in y-axis')
+        self.robot.set_robot_position(0., 0., np.pi/2)
+        for i in range(5):
+            self.robot.move(-1.0, 0., 0.1)
+            self.assertLess(self.robot.pos_y, 0., 'robot does not move negatively in y-axis')
+        #testing if the robot keeps its position during rotataion
+        self.robot.set_robot_position(0., 0., 0.)
+        for i in range(-12,12):
+            self.robot.move(0.0, i*np.pi/6, 0.1)
+            self.assertEqual(self.robot.pos_x, 0., 'robot moves in x axis')
+            self.assertEqual(self.robot.pos_y, 0., 'robot moves in y axis')
