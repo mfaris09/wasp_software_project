@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from simple_robot import SimpleRobot
+from simple_robot import SimpleRobot, SimpleRobotEnv
 
 class testing_robot(unittest.TestCase):
     robot = SimpleRobot(0., 0., 0.,)
@@ -49,3 +49,15 @@ class testing_robot(unittest.TestCase):
         robot_sensors = self.robot.get_robot_sensors()
         self.assertEqual(len(robot_body), 4, 'quantity of robot body incorrect')
         self.assertEqual(len(robot_sensors), self.robot.n_direction, 'quantity of robot sensors incorrect')
+        
+class testing_environment(unittest.TestCase):
+    env = SimpleRobotEnv()
+    def test_init(self):
+        self.assertIsNone(self.env.fig, 'fig is not None')
+        self.assertIsNone(self.env.ax,  'ax is not None')
+        self.assertGreater(self.env.xlim[1], self.env.xlim[0], 'x-axis is not define properly, xmax should > xmin')
+        self.assertGreater(self.env.ylim[1], self.env.ylim[0], 'y-axis is not define properly, ymax should > ymin')
+        self.assertGreater(self.env.dt, 0., 'timestep must be greater than zero')
+        self.assertGreater(len(self.env.obstacles), 0, 'there must be obstacles created to be avoided by the robot')
+        
+        
