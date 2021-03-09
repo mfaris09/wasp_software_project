@@ -12,13 +12,13 @@ class SimpleRobot():
         self.init_robot_body.append(Point(0,0).buffer(1.5)) #outer circle body
         self.init_robot_body.append(box(-1.1, -self.wheel_radius, -0.9, self.wheel_radius)) #left wheel
         self.init_robot_body.append(box( 0.9, -self.wheel_radius,  1.1, self.wheel_radius)) #right wheel
-        self.init_robot_body.append(Polygon([(-0.6, 1),(0, 1.3),(0.6, 1)]))
+        self.init_robot_body.append(Polygon([(-0.6, 1),(0, 1.3),(0.6, 1)])) #triangle as the front marker
         
         # Robot sensor
         self.camera_near_clipping = 1.5 #in meters
         self.camera_far_clipping  = 3.5 #in meters
         self.sensing_range        = self.camera_far_clipping - self.camera_near_clipping
-        self.camera_fov_angle     = 90.0# degree
+        self.camera_fov_angle     = 90.0 #degree
         self.n_direction          = 5
         self.direction_list       = np.linspace(-self.camera_fov_angle, self.camera_fov_angle, self.n_direction+1)
         self.obstacle_map = []
@@ -29,7 +29,8 @@ class SimpleRobot():
                                     [self.camera_near_clipping*np.sin(np.radians(self.direction_list[i+1])),self.camera_near_clipping*np.cos(np.radians(self.direction_list[i+1]))],
                                     [self.camera_far_clipping*np.sin(np.radians(self.direction_list[i+1])),self.camera_far_clipping*np.cos(np.radians(self.direction_list[i+1]))],
                                     [self.camera_far_clipping*np.sin(np.radians(self.direction_list[i])),  self.camera_far_clipping*np.cos(np.radians(self.direction_list[i]))]]))
-        #Rotating for init
+        
+        #Rotating robot's components to rectify the robot drawing 
         angle_correction = -np.pi/2
         for i in range(len(self.init_robot_body)):
             self.init_robot_body[i] = rotate(self.init_robot_body[i], angle_correction, use_radians=True, origin=Point(0, 0))
@@ -37,17 +38,20 @@ class SimpleRobot():
             self.obstacle_map[i] = rotate(self.obstacle_map[i], angle_correction, use_radians=True, origin=Point(0, 0))
             
     def set_robot_position(self, pos_x, pos_y, phi):
+        # Set robot position manually by giving the new position
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.phi = phi
         
     def move(self, linear_speed, angular_speed, timestep):
+        # Calculate robot position from the given speed and timestep which is based on differential drive kinematics
         self.pos_x += linear_speed*np.cos(self.phi)*timestep
         self.pos_y += linear_speed*np.sin(self.phi)*timestep
         self.phi   += angular_speed*timestep
         return self.pos_x, self.pos_y, self.phi
     
     def get_parts(self, part_list):
+        # collect all relevant components given in the part_list
         moved_parts = []
         for part in part_list:
             rotated_part =  rotate(part, self.phi, use_radians=True, origin=Point(0, 0))
@@ -65,8 +69,7 @@ class SimpleRobot():
     
 class SimpleRobotEnv():
     def __init__(self):
-        # timestep
-        self.dt = .1
+        self.dt = .1 # timestep
 
         self.fig = None
         self.ax = None
@@ -89,6 +92,7 @@ class SimpleRobotEnv():
         self.target_list = [[-10,2.5], [10,7.5], [-10, 20], [10,25]]
         
     def render(self, hold=False):
+        # Draw the plot so we can see the visualization
         if self.fig is None:
             assert self.ax is None
             self.fig, self.ax = plt.subplots()
@@ -115,5 +119,11 @@ class SimpleRobotEnv():
             plt.show()
 
 
-    
+    def get_random_position(self):
+        # Generate a pre-defined target position where the robot can appear without colliding to any obstacle
+        target_n = np.random.randint(len(self.target_list))
+        pos_x = self.target_list[target_n][0]
+        pos_y = self.target_list[target_n][1]
+        phi   = np.random.uniform(-np.pi, np.pi)
+        return pos_x, pos_y, phi
     
