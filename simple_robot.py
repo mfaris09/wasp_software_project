@@ -45,3 +45,21 @@ class SimpleRobot():
         self.pos_y += linear_speed*np.sin(self.phi)*timestep
         self.phi   += angular_speed*timestep
         return self.pos_x, self.pos_y, self.phi
+    
+    def get_parts(self, part_list):
+        moved_parts = []
+        for part in part_list:
+            rotated_part =  rotate(part, self.phi, use_radians=True, origin=Point(0, 0))
+            translated_part = translate(rotated_part, self.pos_x, self.pos_y)
+            moved_parts.append(translated_part)
+        return moved_parts
+    
+    def get_robot_body(self):
+        self.robot_body = self.get_parts(self.init_robot_body)
+        return self.robot_body
+    
+    def get_robot_sensors(self):
+        self.robot_sensors = self.get_parts(self.obstacle_map)
+        return self.robot_sensors
+    
+    

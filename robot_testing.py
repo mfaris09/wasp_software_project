@@ -42,3 +42,10 @@ class testing_robot(unittest.TestCase):
             self.robot.move(0.0, i*np.pi/6, 0.1)
             self.assertEqual(self.robot.pos_x, 0., 'robot moves in x axis')
             self.assertEqual(self.robot.pos_y, 0., 'robot moves in y axis')
+            
+    def test_get_parts(self):
+        #test if get_parts return the correct number of robot's part
+        robot_body    = self.robot.get_robot_body()
+        robot_sensors = self.robot.get_robot_sensors()
+        self.assertEqual(len(robot_body), 4, 'quantity of robot body incorrect')
+        self.assertEqual(len(robot_sensors), self.robot.n_direction, 'quantity of robot sensors incorrect')
