@@ -62,4 +62,33 @@ class SimpleRobot():
         self.robot_sensors = self.get_parts(self.obstacle_map)
         return self.robot_sensors
     
+class SimpleRobotEnv():
+    def __init__(self):
+        # timestep
+        self.dt = .1
+
+        self.fig = None
+        self.ax = None
+
+        self.xlim = [-15, 15]
+        self.ylim = [-2.5, 27.5]
+        
+        self.obstacles = []
+        outer_wall_thick = 0.001
+        self.obstacles.append(box(self.xlim[0], self.ylim[0], self.xlim[1]+outer_wall_thick, self.ylim[0]+outer_wall_thick)) #outer wall
+        self.obstacles.append(box(self.xlim[0], self.ylim[0], self.xlim[0]+outer_wall_thick, self.ylim[1]+outer_wall_thick)) #outer wall
+        self.obstacles.append(box(self.xlim[0], self.ylim[1], self.xlim[1]+outer_wall_thick, self.ylim[1]+outer_wall_thick)) #outer wall
+        self.obstacles.append(box(self.xlim[1], self.ylim[0], self.xlim[1]+outer_wall_thick, self.ylim[1]+outer_wall_thick)) #outer wall
+        
+        self.obstacles.append(Polygon([(0,2.5),(-5,5),(5,5)]))
+        self.obstacles.append(box(-12,13,-5,14))
+        self.obstacles.append(box(  0,20,10,21))
+        self.obstacles.append(Point(3,12.5).buffer(2))
+        
+        self.target_list = [[-10,2.5], [10,7.5], [-10, 20], [10,25]]
+        
+
+
+
+    
     
