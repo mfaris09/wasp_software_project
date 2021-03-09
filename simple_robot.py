@@ -1,6 +1,7 @@
 import numpy as np
 from shapely.geometry import Point, box, Polygon
 from shapely.affinity import translate, rotate
+import matplotlib.pyplot as plt
 
 class SimpleRobot():
     def __init__(self, pos_x, pos_y, phi):
@@ -87,7 +88,31 @@ class SimpleRobotEnv():
         
         self.target_list = [[-10,2.5], [10,7.5], [-10, 20], [10,25]]
         
+    def render(self, hold=False):
+        if self.fig is None:
+            assert self.ax is None
+            self.fig, self.ax = plt.subplots()
+        if not self.ax.lines:
+            self.ax.plot([], [], "C0", linewidth=3)
+            for _ in range(4):
+                self.ax.plot([], [], "C1", linewidth=3)
+            self.ax.plot([], [], "C2o", markersize=6)
 
+            self.ax.grid()
+            self.ax.set_xlim(self.xlim)
+            self.ax.set_aspect("equal")
+            self.ax.set_ylim(self.ylim)
+        
+            for obstacle in self.obstacles:
+                x,y = obstacle.exterior.xy
+                self.ax.plot(x, y)
+        
+        self.ax.relim()
+        self.ax.autoscale_view()
+        plt.draw()
+        plt.pause(1e-07)
+        if hold:
+            plt.show()
 
 
     

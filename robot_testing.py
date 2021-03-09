@@ -60,4 +60,8 @@ class testing_environment(unittest.TestCase):
         self.assertGreater(self.env.dt, 0., 'timestep must be greater than zero')
         self.assertGreater(len(self.env.obstacles), 0, 'there must be obstacles created to be avoided by the robot')
         
+    def test_render(self):
+        self.env.render(hold=True)
+        self.assertIsNotNone(self.env.fig, 'fig is None')
+        self.assertIsNotNone(self.env.ax,  'ax is None')
         
