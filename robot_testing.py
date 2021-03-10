@@ -101,4 +101,15 @@ class testing_environment(unittest.TestCase):
         min_distance = np.min(state[:self.env.robot.n_direction])
         self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
     
-    
+    def test_check_collision(self):
+        # Test if the collision is detected properly
+        self.env.reset()
+        self.env.render()
+        collision_bool = self.env.check_collision()
+        self.assertFalse(collision_bool, 'robot in reset position must not collide, boolean must be false')
+        #set the robot to collide with the wall
+        self.env.robot.set_robot_position(14., 10., 0.) 
+        self.env.render()
+        collision_bool = self.env.check_collision()
+        self.assertTrue(collision_bool, 'robot in collision, boolean must be true')
+        

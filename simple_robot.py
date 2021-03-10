@@ -30,13 +30,16 @@ class SimpleRobot():
                                     [self.camera_far_clipping*np.sin(np.radians(self.direction_list[i+1])),self.camera_far_clipping*np.cos(np.radians(self.direction_list[i+1]))],
                                     [self.camera_far_clipping*np.sin(np.radians(self.direction_list[i])),  self.camera_far_clipping*np.cos(np.radians(self.direction_list[i]))]]))
         
-        #Rotating robot's components to rectify the robot drawing 
+        # Rotating robot's components to rectify the robot drawing 
         angle_correction = -np.pi/2
         for i in range(len(self.init_robot_body)):
             self.init_robot_body[i] = rotate(self.init_robot_body[i], angle_correction, use_radians=True, origin=Point(0, 0))
         for i in range(len(self.obstacle_map)):
             self.obstacle_map[i] = rotate(self.obstacle_map[i], angle_correction, use_radians=True, origin=Point(0, 0))
-            
+        # Set self.robot_body and self.robot_sensors variables
+        self.get_robot_body()
+        self.get_robot_sensors()
+        
     def set_robot_position(self, pos_x, pos_y, phi):
         # Set robot position manually by giving the new position
         self.pos_x = pos_x
@@ -193,4 +196,12 @@ class SimpleRobotEnv():
                     intersection_poylgon = obstacle.intersection(self.robot.robot_sensors[i])
                     obstacle_distances[i] = min(obstacle_distances[i], robot_center.distance(intersection_poylgon))
         return np.concatenate((obstacle_distances, self.action))
+    
+    def check_collision(self):
+        robot_center = Point((self.robot.pos_x, self.robot.pos_y))
+        for obstacle in self.obstacles:
+            for i in range(len(self.robot.robot_body)):
+                if obstacle.intersects(self.robot.robot_body[i]):
+                    return True
+        return False
     
