@@ -168,7 +168,26 @@ class testing_vehicle(unittest.TestCase):
 		print('action: ', action)
 		print('reward: ', reward)
 		self.assertGreater(reward,0.001)
-				
+
+	# test done condition
+	def test_done_condition(self):
+		print('check done condition')
+		env = SimpleVehicle()
+		state = env.reset()		
+		state_size = env.state_size
+		action_size = env.discrete_action_size
+		agent = ReinforceAgent(state_size, action_size)
+		
+		action = agent.getAction(state)
+		next_state, reward, done = env.discrete_step(action)		
+		if (env._border_fcn(env.tmpstep[:, 0]) > env.tmpstep[:, 1]).any() \
+                or (env.tmpstep[:, 0] < env.xlim[0]).any() \
+                or (env.tmpstep[:, 0] > env.xlim[1]).any() \
+                or (env.tmpstep[:, 1] < env.ylim[0]).any() \
+				or (env.tmpstep[:, 1] > env.ylim[1]).any():		  				 					
+			self.assertTrue(done)
+		else:
+			self.assertFalse(done)					
 		
 if __name__ == '__main__':
     # begin the unittest.main()
