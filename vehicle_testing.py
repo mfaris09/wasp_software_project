@@ -32,6 +32,18 @@ class testing_vehicle(unittest.TestCase):
 		
 		self.assertLess(self.observation[2],2*np.pi)		
 
+	# environment condition test
+	def test_env(self):
+		print('test vehicle environment')		
+		env  = SimpleVehicle()
+		
+		self.assertIsNone(env.fig)
+		self.assertIsNone(env.ax)			
+		
+		self.assertGreater(env.xlim[1], env.xlim[0])
+		self.assertGreater(env.ylim[1], env.ylim[0])
+		
+		self.assertGreater(env.dt, 0.)
 
 if __name__ == '__main__':
     # begin the unittest.main()
