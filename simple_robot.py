@@ -115,6 +115,9 @@ class SimpleRobotEnv():
         self.discrete_action_list.append(np.array([fast_speed, turn_right]))
         self.discrete_action_size = len(self.discrete_action_list)
         
+        self.reset()
+        self.state_size = len(self.get_state())
+        
     def render(self, hold=False):
         # Draw the plot so we can see the visualization
         def matching_plot(plot_data, updated_data):
@@ -181,7 +184,7 @@ class SimpleRobotEnv():
         self.action = self.discrete_action_list[1]
         pos_x, pos_y, phi = self.get_random_position()
         self.robot.set_robot_position(pos_x, pos_y, phi)
-        
+        return self.get_state()
     
     def get_state(self):
         # Get the state of the robot that contains:
