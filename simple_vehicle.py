@@ -105,3 +105,15 @@ class SimpleVehicle():
 				or (tmp[:, 1] > self.ylim[1]).any()
 		
 		return observation, reward, done
+
+	def discrete_action(self,action_number):
+		assert (action_number >= 0) and action_number < len(self.action_list)
+		action = self.action_list[action_number]
+		# print('discrete action :', action)
+		return action
+
+	def discrete_step(self,action_number):
+		action = self.discrete_action(action_number)
+		discrete_step = self.step(action)
+		# print('discrete step :', discrete_step)
+		return discrete_step
