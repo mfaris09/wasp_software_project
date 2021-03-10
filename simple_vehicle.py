@@ -68,3 +68,40 @@ class SimpleVehicle():
 		observation = self.state # get initial values to "sensor"
 				
 		return observation
+	
+	def step(self, action):
+		speed, phi = action
+		self.action = action 
+		
+		# kinematic model
+		# states: position x, position y, and heading angle
+		x, y, theta = self.state
+		dxdt = speed * np.cos(theta)
+		dydt = speed * np.sin(theta)
+		dthetadt = speed * np.tan(phi) / self.vehicle_mid_length
+		
+		dstatedt = np.array([dxdt, dydt, dthetadt])
+		self.state += dstatedt * self.dt
+		observation = self.state
+				
+		# tmp: contain xy coordinate of 4 points of the vehicle rectangle 
+		# array 0: x axis, array 1: y axis
+		tmp = self._bbox()
+		x, y, theta = self.state
+		# rotate
+		tmp = np.dot(tmp, rotation_matrix(theta))
+		# translate
+		tmp += np.array([[x, y]])
+		self.tmpstep = tmp 	
+		
+		# calculate reward
+		reward = 1. / (np.sqrt(self.state[0] ** 2 + self.state[1] ** 2) + np.sqrt(self.dt*dxdt ** 2 + self.dt*dydt ** 2)) 
+
+		# done condition: pass within parking line or hit the boundaries, wall, obstacles 
+		done = (self._border_fcn(tmp[:, 0]) > tmp[:, 1]).any() \
+                or (tmp[:, 0] < self.xlim[0]).any() \
+                or (tmp[:, 0] > self.xlim[1]).any() \
+                or (tmp[:, 1] < self.ylim[0]).any() \
+				or (tmp[:, 1] > self.ylim[1]).any()
+		
+		return observation, reward, done
