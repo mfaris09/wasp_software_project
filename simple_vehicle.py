@@ -50,6 +50,13 @@ class SimpleVehicle():
 		self.state_size = 3
 		self.discrete_action_size = len(self.action_list)		
 
+		# define obstacles position and size
+		self.obstacles = []
+		self.obstacles.append(box(-10,12,-7,15))        
+		self.obstacles.append(box(7,12,10,15))        		
+		self.ox1, self.oy1 = self.obstacles[0].exterior.xy
+		self.ox2, self.oy2 = self.obstacles[1].exterior.xy
+
 	# for giving initial condition
 	# chosen randomly
 	def reset(self):	
@@ -125,8 +132,10 @@ class SimpleVehicle():
                 or (tmp[:, 0] < self.xlim[0]).any() \
                 or (tmp[:, 0] > self.xlim[1]).any() \
                 or (tmp[:, 1] < self.ylim[0]).any() \
-				or (tmp[:, 1] > self.ylim[1]).any()
-		
+				or (tmp[:, 1] > self.ylim[1]).any() \
+				or ((tmp[:, 0] > min(self.ox1)).any() and (tmp[:, 0] < max(self.ox1)).any() and (tmp[:, 1] > min(self.oy1)).any() and (tmp[:, 1] < max(self.oy1)).any()) \
+				or ((tmp[:, 0] > min(self.ox2)).any() and (tmp[:, 0] < max(self.ox2)).any() and (tmp[:, 1] > min(self.oy2)).any() and (tmp[:, 1] < max(self.oy2)).any())
+								
 		return observation, reward, done
 
 	def discrete_action(self,action_number):
@@ -197,6 +206,9 @@ class SimpleVehicle():
 			self.ax.set_xlim(self.xlim)
 			self.ax.set_aspect("equal")
 			self.ax.set_ylim(self.ylim)
+			
+			self.ax.plot(self.ox1, self.oy1)
+			self.ax.plot(self.ox2, self.oy2)					
 					
 		bbox, lfw, rfw, lrw, rrw, center = self.ax.lines[:6]
 						
