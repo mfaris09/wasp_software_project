@@ -187,7 +187,19 @@ class testing_vehicle(unittest.TestCase):
 				or (env.tmpstep[:, 1] > env.ylim[1]).any():		  				 					
 			self.assertTrue(done)
 		else:
-			self.assertFalse(done)					
+			self.assertFalse(done)
+
+	def check_discrete_action():
+		print('check discrete action function')
+		env = SimpleVehicle()
+		action = discrete_action(3) # choose any number
+		list_action_length = env.discrete_action_size
+		# speed
+		assertGreater(action[0], 0)
+		assertLess(action[0], 6)
+		# heading
+		assertGreater(action[0], -np.pi/4)
+		assertLess(action[0], np.pi/4)								
 		
 if __name__ == '__main__':
     # begin the unittest.main()
