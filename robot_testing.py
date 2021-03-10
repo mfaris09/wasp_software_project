@@ -154,4 +154,15 @@ class testing_environment(unittest.TestCase):
         self.assertEqual(reward, -1.0*action[0], 'Collision, reward must be minimum')
         self.assertTrue(done, 'robot in collision, boolean must be true')
         
+    def test_discrete_action(self):
+        # Test all the possible action for this environment
+        for i in range(self.env.discrete_action_size):
+            self.env.robot.set_robot_position(12.5, 10., 0.)
+            self.env.render()
+            state, reward, done = self.env.discrete_step(i)
+            self.assertLess(reward, 0., 'obstacle is near, reward must be negative')
+            self.assertFalse(done, 'robot not in collision, boolean must be false')
+            min_distance = np.min(state[:self.env.robot.n_direction])
+            self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
+            
         
