@@ -56,7 +56,7 @@ class SimpleVehicle():
 		self.action = np.array([0., np.pi / 4.])
 
 		# initial states: pos x, pos y, direct
-		# chosen to be andom within bounds
+		# chosen to be random within bounds
 		self.state = np.array([
 			# rear axle center x-position
 			20. * np.random.rand() - 10., # plus minus 10
@@ -165,3 +165,13 @@ class SimpleVehicle():
 		s, phi = self.action
 		wheel = np.dot(wheel, rotation_matrix(phi))
 		return wheel		
+		
+	# for describing parking border
+	def _border_fcn(self, x):
+		ParkWidthScale = .7
+		ParkLengthScale = 2.
+		ParkOutWallPos = 5.	
+		parking_scale = -self.scaley * self.vehicle_total_length * (np.sign(x + self.scalex * ParkWidthScale * self.vehicle_width) - 
+		np.sign(x - self.scalex * ParkWidthScale * self.vehicle_width)) / ParkLengthScale + ParkOutWallPos
+		
+		return parking_scale		
