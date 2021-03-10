@@ -90,6 +90,8 @@ class SimpleRobotEnv():
         self.obstacles.append(Point(3,12.5).buffer(2))
         
         self.target_list = [[-10,2.5], [10,7.5], [-10, 20], [10,25]]
+        pos_x, pos_y, phi = self.get_random_position()
+        self.robot = SimpleRobot(pos_x, pos_y, phi)
         
     def render(self, hold=False):
         # Draw the plot so we can see the visualization
@@ -110,6 +112,14 @@ class SimpleRobotEnv():
             for obstacle in self.obstacles:
                 x,y = obstacle.exterior.xy
                 self.ax.plot(x, y)
+                
+            for body in self.robot.get_robot_body():
+                x,y = body.exterior.xy
+                self.ax.plot(x, y, 'k')
+            
+            for sensor in self.robot.get_robot_sensors():
+                x,y = sensor.exterior.xy
+                self.ax.plot(x, y, 'silver')
         
         self.ax.relim()
         self.ax.autoscale_view()

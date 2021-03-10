@@ -61,7 +61,7 @@ class testing_environment(unittest.TestCase):
         self.assertGreater(len(self.env.obstacles), 0, 'there must be obstacles created to be avoided by the robot')
         
     def test_render(self):
-        self.env.render(hold=False)
+        self.env.render(hold=True)
         self.assertIsNotNone(self.env.fig, 'fig is None')
         self.assertIsNotNone(self.env.ax,  'ax is None')
         
@@ -71,3 +71,6 @@ class testing_environment(unittest.TestCase):
         for i in range(100):
             pos_x, pos_y, phi = self.env.get_random_position()
             self.assertIn([pos_x, pos_y], self.env.target_list, 'position is not in target list')
+            
+            
+            
