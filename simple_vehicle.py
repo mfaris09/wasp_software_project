@@ -174,4 +174,84 @@ class SimpleVehicle():
 		parking_scale = -self.scaley * self.vehicle_total_length * (np.sign(x + self.scalex * ParkWidthScale * self.vehicle_width) - 
 		np.sign(x - self.scalex * ParkWidthScale * self.vehicle_width)) / ParkLengthScale + ParkOutWallPos
 		
-		return parking_scale		
+		return parking_scale
+		
+	def render(self):
+		if self.fig is None:
+			assert self.ax is None
+			self.fig, self.ax = plt.subplots()
+		
+		# plotting border and dot on vehicle and walls	
+		if not self.ax.lines:
+			self.ax.plot([], [], "C0", linewidth=3)
+			for _ in range(4):
+				self.ax.plot([], [], "C1", linewidth=3)
+			self.ax.plot([], [], "C2o", markersize=6)
+		
+			x = np.linspace(-15, 15, 1000)
+			y = self._border_fcn(x)
+			self.ax.plot(x, y, "C3", linewidth=3) # plot red wall
+			self.ax.plot([0], [0], "C3o", markersize=6) # plot red dot on parking
+	
+			self.ax.grid()
+			self.ax.set_xlim(self.xlim)
+			self.ax.set_aspect("equal")
+			self.ax.set_ylim(self.ylim)
+					
+		bbox, lfw, rfw, lrw, rrw, center = self.ax.lines[:6]
+						
+		# plotting vehicle's parts
+		tmp = self.vehicle_body()
+		x, y, theta = self.state
+		# rotate
+		tmp = np.dot(tmp, rotation_matrix(theta))
+		# translate
+		tmp += np.array([[x, y]])
+		# repeat to close the drawed object
+		tmp = np.concatenate([tmp, tmp[[0]]])
+		bbox.set_data(tmp.T)
+
+		# left front wheel	
+		tmp = self._front_wheel()
+		tmp += np.array([[self.vehicle_mid_length,  self.front_wheel_bar / 2.]]) 
+		# rotate
+		tmp = np.dot(tmp, rotation_matrix(theta))
+		# translate
+		tmp += np.array([[x, y]])
+		lfw.set_data(tmp.T) 
+
+		# right front wheel		
+		tmp = self._front_wheel()
+		tmp += np.array([[self.vehicle_mid_length, -self.front_wheel_bar / 2.]])
+		# rotate
+		tmp = np.dot(tmp, rotation_matrix(theta))
+		# translate
+		tmp += np.array([[x, y]])
+		rfw.set_data(tmp.T) 
+	
+		# left rear wheel	
+		tmp = self._rear_wheel()
+		tmp += np.array([[0.,  self.rear_wheel_bar / 2.]])
+		# rotate
+		tmp = np.dot(tmp, rotation_matrix(theta))
+		# translate
+		tmp += np.array([[x, y]])
+		lrw.set_data(tmp.T) 
+		
+		# right rear wheel	
+		tmp = self._rear_wheel()
+		tmp += np.array([[0., -self.rear_wheel_bar / 2.]])
+		# rotate
+		tmp = np.dot(tmp, rotation_matrix(theta))
+		# translate
+		tmp += np.array([[x, y]])
+		rrw.set_data(tmp.T) 
+	
+		center.set_data([x], [y]) # 
+	
+		self.ax.relim() # 
+		self.ax.autoscale_view()
+		plt.draw()
+		
+		# process delay
+		plt.pause(1e-07)			
