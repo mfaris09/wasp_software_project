@@ -154,7 +154,21 @@ class testing_vehicle(unittest.TestCase):
 		
 		self.assertGreater(action,-1)
 		self.assertLess(action,6)												
-		
+
+	# 12. Check minimum calculated reward
+	def test_min_reward(self):
+		print('test minimum reward')
+		env  = SimpleVehicle()
+		state = env.reset()		
+		state_size = env.state_size
+		action_size = env.discrete_action_size
+		agent = ReinforceAgent(state_size, action_size)
+		action = agent.getAction(state)
+		next_state, reward, done = env.discrete_step(action)		
+		print('action: ', action)
+		print('reward: ', reward)
+		self.assertGreater(reward,0.001)
+				
 		
 if __name__ == '__main__':
     # begin the unittest.main()
