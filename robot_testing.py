@@ -113,3 +113,30 @@ class testing_environment(unittest.TestCase):
         collision_bool = self.env.check_collision()
         self.assertTrue(collision_bool, 'robot in collision, boolean must be true')
         
+    def test_get_reward(self):
+        # Test the correctness of the reward given the states
+        self.env.robot.set_robot_position(10., 10., 0.)
+        state = self.env.get_state()
+        reward = self.env.get_reward(state)
+        self.assertEqual(reward, -0.1*self.env.action[0], 'No obstacle detected, reward must be -0.1')
+        #set the robot to collide with the wall
+        self.env.robot.set_robot_position(14., 10., 0.) 
+        state = self.env.get_state()
+        reward = self.env.get_reward(state)
+        self.assertEqual(reward, -1.0*self.env.action[0], 'Collision, reward must be minimum')
+        #set the robot in safe situation
+        self.env.robot.set_robot_position(12., 10., 0.)
+        state = self.env.get_state()
+        reward = self.env.get_reward(state)
+        self.assertGreater(reward, 0., 'safe situation, reward must be positive')
+        #set the robot in warning situation
+        self.env.robot.set_robot_position(12.5, 10., 0.)
+        state = self.env.get_state()
+        reward = self.env.get_reward(state)
+        self.assertLess(reward, 0., 'obstacle is near, reward must be negative')
+        
+        
+        
+        
+        
+        

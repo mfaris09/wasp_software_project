@@ -205,3 +205,23 @@ class SimpleRobotEnv():
                     return True
         return False
     
+    def get_reward(self, state):
+        # Calculate reward value from the given state
+        # It consider the closest distance of the obstacle
+        # and multiply by the speed so risky dangerous situation is penalized more with faster speed 
+        # and safe situation is rewarded more with faster speed
+        closest_distance = np.min(state[:self.robot.n_direction]) #get the closest distance from all sensors
+        robot_linear_speed = state[self.robot.n_direction]
+        if self.check_collision():
+            reward = -1.0 * robot_linear_speed
+        elif closest_distance >= self.robot.camera_far_clipping:
+            reward = -0.1 * robot_linear_speed
+        elif closest_distance >= (2/3*self.robot.sensing_range + self.robot.camera_near_clipping):
+            reward = 1 * robot_linear_speed
+        elif closest_distance >= (1/3*self.robot.sensing_range + self.robot.camera_near_clipping):
+            reward = -0.3 * robot_linear_speed
+        else: 
+            reward = -0.5 * robot_linear_speed
+        return reward    
+    
+    
