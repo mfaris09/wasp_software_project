@@ -107,8 +107,40 @@ class testing_vehicle(unittest.TestCase):
 				
 		self.assertNotEqual(init[0],next_state[0])	
 		self.assertNotEqual(init[1],next_state[1])					
-		self.assertLess(init[2],next_state[2])						
+		self.assertLess(init[2],next_state[2])	
 
+	# 9.
+	def test_next_state_right(self):
+		print('test right move')				
+		env = SimpleVehicle()		
+		next_state = env.reset()
+		print(next_state)
+		init = copy.copy(next_state)
+		action = 4# move right		
+		next_state, reward, done = env.discrete_step(action)
+		print(next_state)
+		print(init)
+				
+		self.assertNotEqual(init[0],next_state[0])	
+		self.assertNotEqual(init[1],next_state[1])					
+		self.assertGreater(init[2],next_state[2])							
+
+	# 10.
+	def test_next_state_right_fast(self):
+		print('test right move fast')				
+		env = SimpleVehicle()		
+		next_state = env.reset()
+		print(next_state)
+		init = copy.copy(next_state)
+		action = 5# move right fast		
+		next_state, reward, done = env.discrete_step(action)
+		print(next_state)
+		print(init)
+				
+		self.assertNotEqual(init[0],next_state[0])	
+		self.assertNotEqual(init[1],next_state[1])					
+		self.assertGreater(init[2],next_state[2])	
+		
 if __name__ == '__main__':
     # begin the unittest.main()
     unittest.main()
