@@ -93,6 +93,25 @@ class SimpleRobotEnv():
         pos_x, pos_y, phi = self.get_random_position()
         self.robot = SimpleRobot(pos_x, pos_y, phi)
         
+        #List discrete actions for RL
+        self.discrete_action_list = []
+        slow_speed   = 0.3
+        medium_speed = 0.6
+        fast_speed   = 0.9
+        turn_left  = -np.pi/8
+        straight   = 0.
+        turn_right = np.pi/8
+        self.discrete_action_list.append(np.array([slow_speed, turn_left]))
+        self.discrete_action_list.append(np.array([slow_speed, straight]))
+        self.discrete_action_list.append(np.array([slow_speed, turn_right]))
+        self.discrete_action_list.append(np.array([medium_speed, turn_left]))
+        self.discrete_action_list.append(np.array([medium_speed, straight]))
+        self.discrete_action_list.append(np.array([medium_speed, turn_right]))
+        self.discrete_action_list.append(np.array([fast_speed, turn_left]))
+        self.discrete_action_list.append(np.array([fast_speed, straight]))
+        self.discrete_action_list.append(np.array([fast_speed, turn_right]))
+        self.discrete_action_size = len(self.discrete_action_list)
+        
     def render(self, hold=False):
         # Draw the plot so we can see the visualization
         if self.fig is None:
@@ -136,4 +155,10 @@ class SimpleRobotEnv():
         pos_y = self.target_list[target_n][1]
         phi   = np.random.uniform(-np.pi, np.pi)
         return pos_x, pos_y, phi
+    
+    def reset(self):
+        # Reset robot to to pre-defined position 
+        self.action = self.discrete_action_list[1]
+        pos_x, pos_y, phi = self.get_random_position()
+        self.robot.set_robot_position(pos_x, pos_y, phi)
     

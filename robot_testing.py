@@ -61,7 +61,7 @@ class testing_environment(unittest.TestCase):
         self.assertGreater(len(self.env.obstacles), 0, 'there must be obstacles created to be avoided by the robot')
         
     def test_render(self):
-        self.env.render(hold=True)
+        self.env.render(hold=False)
         self.assertIsNotNone(self.env.fig, 'fig is None')
         self.assertIsNotNone(self.env.ax,  'ax is None')
         
@@ -72,5 +72,9 @@ class testing_environment(unittest.TestCase):
             pos_x, pos_y, phi = self.env.get_random_position()
             self.assertIn([pos_x, pos_y], self.env.target_list, 'position is not in target list')
             
-            
-            
+    def test_reset(self):
+        #test if reset is correct
+        self.env.reset()
+        self.assertEqual(self.env.action[0], self.env.discrete_action_list[1][0], 'linear speed in reset action is not correct')
+        self.assertEqual(self.env.action[1], self.env.discrete_action_list[1][1], 'angular speed in reset action is not correct')
+        
