@@ -135,8 +135,34 @@ class testing_environment(unittest.TestCase):
         reward = self.env.get_reward(state)
         self.assertLess(reward, 0., 'obstacle is near, reward must be negative')
         
+    def test_step(self):
+        # Set the robot in warning situation
+        # Put a robot towards a wall and detecting obstacle
+        self.env.robot.set_robot_position(12.5, 10., 0.)
+        linear_speed = 1.0
+        angular_speed = 0.0
+        action = [linear_speed, angular_speed]
+        # move forward by 0.1 m, there must be no collision and obstacle is detected
+        state, reward, done = self.env.step(action)
+        self.assertLess(reward, 0., 'obstacle is near, reward must be negative')
+        self.assertFalse(done, 'robot not in collision, boolean must be false')
+        min_distance = np.min(state[:self.env.robot.n_direction])
+        self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
+        # Move the robot forward until it collides to the wall
+        for i in range(15):
+            state, reward, done = self.env.step(action)
+        self.assertEqual(reward, -1.0*action[0], 'Collision, reward must be minimum')
+        self.assertTrue(done, 'robot in collision, boolean must be true')
         
-        
-        
-        
+    def test_discrete_action(self):
+        # Test all the possible action for this environment
+        for i in range(self.env.discrete_action_size):
+            self.env.robot.set_robot_position(12.5, 10., 0.)
+            self.env.render()
+            state, reward, done = self.env.discrete_step(i)
+            self.assertLess(reward, 0., 'obstacle is near, reward must be negative')
+            self.assertFalse(done, 'robot not in collision, boolean must be false')
+            min_distance = np.min(state[:self.env.robot.n_direction])
+            self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
+            
         

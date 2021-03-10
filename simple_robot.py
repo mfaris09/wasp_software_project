@@ -224,4 +224,28 @@ class SimpleRobotEnv():
             reward = -0.5 * robot_linear_speed
         return reward    
     
+    def step(self, action):
+        # step function for RL
+        # The input is an action and returning state, reward and done status
+        # done is set true when the robot collides with obstacle
+        linear_speed, angular_speed = action
+        self.action = action 
+        
+        self.robot.move(linear_speed, angular_speed, self.dt)
+        state = self.get_state()
+
+        reward = self.get_reward(state)
+        done = self.check_collision()
+        return state, reward, done
+    
+    def discrete_action(self,action_number):
+        # Select pre-defined discrete action for RL
+        assert (action_number >= 0) and action_number < self.discrete_action_size
+        return self.discrete_action_list[action_number]
+    
+    def discrete_step(self,action_number):
+        # Run step function using discrete action
+        action = self.discrete_action(action_number)
+        return self.step(action)
+    
     
