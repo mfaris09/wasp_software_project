@@ -52,13 +52,15 @@ class testing_robot(unittest.TestCase):
         
 class testing_environment(unittest.TestCase):
     env = SimpleRobotEnv()
+    
     def test_init(self):
-        self.assertIsNone(self.env.fig, 'fig is not None')
-        self.assertIsNone(self.env.ax,  'ax is not None')
-        self.assertGreater(self.env.xlim[1], self.env.xlim[0], 'x-axis is not define properly, xmax should > xmin')
-        self.assertGreater(self.env.ylim[1], self.env.ylim[0], 'y-axis is not define properly, ymax should > ymin')
-        self.assertGreater(self.env.dt, 0., 'timestep must be greater than zero')
-        self.assertGreater(len(self.env.obstacles), 0, 'there must be obstacles created to be avoided by the robot')
+        test_env = SimpleRobotEnv()
+        self.assertIsNone(test_env.fig, 'fig is not None')
+        self.assertIsNone(test_env.ax,  'ax is not None')
+        self.assertGreater(test_env.xlim[1], test_env.xlim[0], 'x-axis is not define properly, xmax should > xmin')
+        self.assertGreater(test_env.ylim[1], test_env.ylim[0], 'y-axis is not define properly, ymax should > ymin')
+        self.assertGreater(test_env.dt, 0., 'timestep must be greater than zero')
+        self.assertGreater(len(test_env.obstacles), 0, 'there must be obstacles created to be avoided by the robot')
         
     def test_render(self):
         self.env.render(hold=False)
@@ -78,3 +80,25 @@ class testing_environment(unittest.TestCase):
         self.assertEqual(self.env.action[0], self.env.discrete_action_list[1][0], 'linear speed in reset action is not correct')
         self.assertEqual(self.env.action[1], self.env.discrete_action_list[1][1], 'angular speed in reset action is not correct')
         
+    def test_get_state(self):
+        #test if the state size is correct
+        self.env.reset()
+        self.assertEqual(len(self.env.get_state()), self.env.robot.n_direction + 2, 'state size incorrect')
+        for i in range(100):
+            pos_x, pos_y, phi = self.env.get_random_position()
+            self.env.robot.set_robot_position(pos_x, pos_y, phi)
+            state = self.env.get_state()
+            max_distance = np.max(state[:self.env.robot.n_direction])
+            self.assertEqual(max_distance, self.env.robot.camera_far_clipping, 'sensor reading has problem, there must be a sensor that has max value (3.5)')
+        #set the robot far from a wall, the sensor must have readings < camera_far_clipping
+        self.env.robot.set_robot_position(10., 10., 0.)
+        state = self.env.get_state()
+        min_distance = np.min(state[:self.env.robot.n_direction])
+        self.assertEqual(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect when no obstacle')
+        #set the robot near a wall, the sensor must have readings < camera_far_clipping
+        self.env.robot.set_robot_position(12., 10., 0.)
+        state = self.env.get_state()
+        min_distance = np.min(state[:self.env.robot.n_direction])
+        self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
+    
+    

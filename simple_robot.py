@@ -19,7 +19,7 @@ class SimpleRobot():
         self.camera_far_clipping  = 3.5 #in meters
         self.sensing_range        = self.camera_far_clipping - self.camera_near_clipping
         self.camera_fov_angle     = 90.0 #degree
-        self.n_direction          = 5
+        self.n_direction          = 5 # number of simulated sensor. It can also be seen as how many zones that camera's Field of View (FoV) will be divided
         self.direction_list       = np.linspace(-self.camera_fov_angle, self.camera_fov_angle, self.n_direction+1)
         self.obstacle_map = []
         self.obstacle_distances = np.ones((self.n_direction))*self.camera_far_clipping
@@ -114,6 +114,13 @@ class SimpleRobotEnv():
         
     def render(self, hold=False):
         # Draw the plot so we can see the visualization
+        def matching_plot(plot_data, updated_data):
+            # matching the plot with robot component
+            # this helper function is used for animating the robot movement
+            assert len(plot_data) == len(updated_data)
+            for i in range(len(plot_data)):
+                plot_data[i].set_data(updated_data[i].exterior.xy)
+        
         if self.fig is None:
             assert self.ax is None
             self.fig, self.ax = plt.subplots()
@@ -139,6 +146,16 @@ class SimpleRobotEnv():
             for sensor in self.robot.get_robot_sensors():
                 x,y = sensor.exterior.xy
                 self.ax.plot(x, y, 'silver')
+                
+        # Retrieve robot's plot so it moves after initiated
+        # This is to avoid redrawing the plot every cycle
+        obstacle_idx = 6 + len(self.obstacles)
+        robot_idx    = obstacle_idx + len(self.robot.get_robot_body())
+        sensor_idx   = robot_idx + len(self.robot.get_robot_sensors())
+        robot_body   = self.ax.lines[obstacle_idx:robot_idx]
+        robot_sensor = self.ax.lines[robot_idx:sensor_idx]
+        matching_plot(robot_body, self.robot.get_robot_body())
+        matching_plot(robot_sensor, self.robot.get_robot_sensors())
         
         self.ax.relim()
         self.ax.autoscale_view()
@@ -161,4 +178,19 @@ class SimpleRobotEnv():
         self.action = self.discrete_action_list[1]
         pos_x, pos_y, phi = self.get_random_position()
         self.robot.set_robot_position(pos_x, pos_y, phi)
+        
+    
+    def get_state(self):
+        # Get the state of the robot that contains:
+        # 1. list of Sensor readings with the size equals to robot.n_direction
+        # 2. the action taken by the robot (stored as the last two of the list member)
+        self.render()
+        obstacle_distances = np.ones((self.robot.n_direction))*self.robot.camera_far_clipping
+        robot_center       = Point((self.robot.pos_x, self.robot.pos_y))
+        for obstacle in self.obstacles:
+            for i in range(self.robot.n_direction):
+                if obstacle.intersects(self.robot.robot_sensors[i]):
+                    intersection_poylgon = obstacle.intersection(self.robot.robot_sensors[i])
+                    obstacle_distances[i] = min(obstacle_distances[i], robot_center.distance(intersection_poylgon))
+        return np.concatenate((obstacle_distances, self.action))
     
