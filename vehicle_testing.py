@@ -140,6 +140,21 @@ class testing_vehicle(unittest.TestCase):
 		self.assertNotEqual(init[0],next_state[0])	
 		self.assertNotEqual(init[1],next_state[1])					
 		self.assertGreater(init[2],next_state[2])	
+
+	# 11. test RL action
+	def test_rl_action(self):
+		print('test RL action')
+		env  = SimpleVehicle()
+		state = env.reset()		
+		state_size = env.state_size
+		action_size = env.discrete_action_size
+		agent = ReinforceAgent(state_size, action_size)
+		action = agent.getAction(state)
+		print('action: ', action)
+		
+		self.assertGreater(action,-1)
+		self.assertLess(action,6)												
+		
 		
 if __name__ == '__main__':
     # begin the unittest.main()
