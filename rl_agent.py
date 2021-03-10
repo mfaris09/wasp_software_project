@@ -11,7 +11,6 @@ from collections import deque
 from keras.models import Sequential, load_model
 from keras.optimizers import RMSprop
 from keras.layers import Dense, Dropout, Activation
-from simple_robot import SimpleRobot, SimpleRobotEnv
 
 class ReinforceAgent():
     def __init__(self, state_size, action_size):

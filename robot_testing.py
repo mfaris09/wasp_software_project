@@ -8,14 +8,14 @@ class testing_robot(unittest.TestCase):
         #testing if the robot position is updated properly
         for i in range(-5, 5, 2):
             self.robot.set_robot_position(i, i, i*np.pi)
-            self.assertEquals(self.robot.pos_x, i)
-            self.assertEquals(self.robot.pos_y, i)
-            self.assertEquals(self.robot.phi, i*np.pi)
+            self.assertEqual(self.robot.pos_x, i)
+            self.assertEqual(self.robot.pos_y, i)
+            self.assertEqual(self.robot.phi, i*np.pi)
     
     def test_init(self):
         #testing if the rotation does not add more components
-        self.assertEquals(len(self.robot.init_robot_body), 4)
-        self.assertEquals(len(self.robot.obstacle_map), self.robot.n_direction)
+        self.assertEqual(len(self.robot.init_robot_body), 4)
+        self.assertEqual(len(self.robot.obstacle_map), self.robot.n_direction)
         
     def test_move(self):
         #testing if the robot moves in x-axis
@@ -55,8 +55,6 @@ class testing_environment(unittest.TestCase):
     
     def test_init(self):
         test_env = SimpleRobotEnv()
-        self.assertIsNone(test_env.fig, 'fig is not None')
-        self.assertIsNone(test_env.ax,  'ax is not None')
         self.assertGreater(test_env.xlim[1], test_env.xlim[0], 'x-axis is not define properly, xmax should > xmin')
         self.assertGreater(test_env.ylim[1], test_env.ylim[0], 'y-axis is not define properly, ymax should > ymin')
         self.assertGreater(test_env.dt, 0., 'timestep must be greater than zero')
@@ -165,4 +163,5 @@ class testing_environment(unittest.TestCase):
             min_distance = np.min(state[:self.env.robot.n_direction])
             self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
             
-        
+if __name__ == '__main__':
+    unittest.main()
