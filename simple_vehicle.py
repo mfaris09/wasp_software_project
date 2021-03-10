@@ -68,6 +68,28 @@ class SimpleVehicle():
 		observation = self.state # get initial values to "sensor"
 				
 		return observation
+
+	def set_vehicle_position(self, pos_x, pos_y, direction):	
+		self.action = np.array([0., np.pi / 4.])
+		
+		assert self.xlim[0] < pos_x < self.xlim[1]
+		assert 10. < pos_y < self.ylim[1]
+		assert direction < 2*np.pi
+
+		# initial states: pos x, pos y, direct
+		# chosen to be andom within bounds
+		self.state = np.array([
+			# rear axle center x-position
+			pos_x, # plus minus 10
+			# rear axle center y-position 
+			pos_y, # positive 10 - 20
+			# direction of the car
+			direction
+		])
+		
+		observation = self.state # get initial values to "sensor"
+				
+		return observation		
 	
 	def step(self, action):
 		speed, phi = action
@@ -86,7 +108,7 @@ class SimpleVehicle():
 				
 		# tmp: contain xy coordinate of 4 points of the vehicle rectangle 
 		# array 0: x axis, array 1: y axis
-		tmp = self._bbox()
+		tmp = self.vehicle_body()
 		x, y, theta = self.state
 		# rotate
 		tmp = np.dot(tmp, rotation_matrix(theta))
@@ -117,3 +139,13 @@ class SimpleVehicle():
 		discrete_step = self.step(action)
 		# print('discrete step :', discrete_step)
 		return discrete_step
+
+	# define vehicle size
+	def vehicle_body(self):
+		bbox = np.array([
+			[self.vehicle_mid_length + self.vehicle_front_length,  .5 * self.vehicle_width],
+			[self.vehicle_mid_length + self.vehicle_front_length, -.5 * self.vehicle_width],
+			[        -self.vehicle_rear_length, -.5 * self.vehicle_width],
+			[        -self.vehicle_rear_length,  .5 * self.vehicle_width]
+		])
+		return bbox
