@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import rotation_matrix
 
 class SimpleVehicle():
 	# define constructor
@@ -47,7 +48,7 @@ class SimpleVehicle():
 				
 		# define number of states and actions		
 		self.state_size = 3
-		self.action_size = len(self.action_list)		
+		self.discrete_action_size = len(self.action_list)		
 
 	# for giving initial condition
 	# chosen randomly
@@ -149,3 +150,18 @@ class SimpleVehicle():
 			[        -self.vehicle_rear_length,  .5 * self.vehicle_width]
 		])
 		return bbox
+
+	# rear wheel function
+	def _rear_wheel(self):
+		wheel = np.array([
+			[-self.wheel_diameter, 0.], 
+			[ self.wheel_diameter, 0.]
+		])
+		return wheel
+	
+	# front wheel function
+	def _front_wheel(self):
+		wheel = self._rear_wheel() 
+		s, phi = self.action
+		wheel = np.dot(wheel, rotation_matrix(phi))
+		return wheel		
