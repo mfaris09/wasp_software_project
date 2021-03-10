@@ -49,4 +49,22 @@ class SimpleVehicle():
 		self.state_size = 3
 		self.action_size = len(self.action_list)		
 
+	# for giving initial condition
+	# chosen randomly
+	def reset(self):	
+		self.action = np.array([0., np.pi / 4.])
 
+		# initial states: pos x, pos y, direct
+		# chosen to be andom within bounds
+		self.state = np.array([
+			# rear axle center x-position
+			20. * np.random.rand() - 10., # plus minus 10
+			# rear axle center y-position 
+			10. * np.random.rand() + 10., # positive 10 - 20
+			# direction of the car
+			2. * np.pi * np.random.rand() # within 360 degree
+		])
+		
+		observation = self.state # get initial values to "sensor"
+				
+		return observation
