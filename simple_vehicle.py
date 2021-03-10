@@ -24,4 +24,29 @@ class SimpleVehicle():
 		self.rear_wheel_bar = 1.557
 		self.wheel_diameter = 0.5		
 
+		# general scales
+		self.scalex = 2.
+		self.scaley = 1.5
+		
+		# def list of actions (discrete) 
+		self.action_list = []
+		
+		forward_lin_speed = 1
+		forward_lin_speed_fast = 3
+				
+		straight = 0
+		turn_left  = np.pi/4
+		turn_right = -np.pi/4
+		
+		self.action_list.append(np.array([forward_lin_speed, turn_left]))	# 0		
+		self.action_list.append(np.array([forward_lin_speed_fast, turn_left]))	# 1		
+		self.action_list.append(np.array([forward_lin_speed, straight])) # 2			
+		self.action_list.append(np.array([forward_lin_speed_fast, straight])) # 3			
+		self.action_list.append(np.array([forward_lin_speed, turn_right])) # 4			
+		self.action_list.append(np.array([forward_lin_speed_fast, turn_right])) # 5			
+				
+		# define number of states and actions		
+		self.state_size = 3
+		self.action_size = len(self.action_list)		
+
 
