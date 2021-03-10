@@ -3,6 +3,7 @@ import numpy as np
 import unittest
 from simple_vehicle import SimpleVehicle
 import copy
+from rl_agent import ReinforceAgent
 
 class testing_vehicle(unittest.TestCase):
 	

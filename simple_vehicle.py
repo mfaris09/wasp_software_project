@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from utils import rotation_matrix
+from shapely.geometry import Polygon, box, LineString, Point
+from shapely.affinity import translate
 
 class SimpleVehicle():
 	# define constructor
