@@ -127,7 +127,10 @@ class SimpleVehicle():
 		self.tmpstep = tmp 	
 		
 		# calculate reward
-		reward = 1. / (np.sqrt(self.state[0] ** 2 + self.state[1] ** 2) + np.sqrt(self.dt*dxdt ** 2 + self.dt*dydt ** 2)) 
+		position_based_reward = np.sqrt(self.state[0] ** 2 + self.state[1] ** 2)
+		velocity_based_reward = np.sqrt(self.dt*dxdt ** 2 + self.dt*dydt ** 2) 
+		
+		reward = 1. / (position_based_reward + velocity_based_reward) 
 
 		# done condition: pass within parking line or hit the boundaries, wall, obstacles 
 		done = (self._border_fcn(tmp[:, 0]) > tmp[:, 1]).any() \
