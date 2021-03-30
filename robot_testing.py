@@ -75,8 +75,8 @@ class testing_environment(unittest.TestCase):
     def test_reset(self):
         #test if reset is correct
         self.env.reset()
-        self.assertEqual(self.env.action[0], self.env.discrete_action_list[1][0], 'linear speed in reset action is not correct')
-        self.assertEqual(self.env.action[1], self.env.discrete_action_list[1][1], 'angular speed in reset action is not correct')
+        self.assertEqual(self.env.action[0], self.env.rl_actions.get_action(1)[0], 'linear speed in reset action is not correct')
+        self.assertEqual(self.env.action[1], self.env.rl_actions.get_action(1)[1], 'angular speed in reset action is not correct')
         
     def test_get_state(self):
         #test if the state size is correct
@@ -154,7 +154,7 @@ class testing_environment(unittest.TestCase):
         
     def test_discrete_action(self):
         # Test all the possible action for this environment
-        for i in range(self.env.discrete_action_size):
+        for i in range(self.env.rl_actions.number_of_available_action):
             self.env.robot.set_robot_position(12.5, 10., 0.)
             self.env.render()
             state, reward, done = self.env.discrete_step(i)

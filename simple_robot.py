@@ -98,16 +98,46 @@ class TranslationSpeed():
         assert isinstance(medium, numbers.Number)
         assert isinstance(fast, numbers.Number)
         #translation speed
-        self.slow   = slow
-        self.medium = medium
-        self.fast   = fast
+        self.__slow   = slow
+        self.__medium = medium
+        self.__fast   = fast
+        
+    def set_slow(self, slow):
+        assert isinstance(slow, numbers.Number)
+        self.__slow   = slow
+    def get_slow(self):
+        return self.__slow
+            
+    def set_medium(self, medium):
+        assert isinstance(medium, numbers.Number)
+        self.__medium   = medium
+    def get_medium(self):
+        return self.__medium
+        
+    def set_fast(self, fast):
+        assert isinstance(fast, numbers.Number)
+        self.__fast   = fast
+    def get_fast(self):
+        return self.__fast
+    
         
 class TurningSpeed():
     def __init__(self, turning_speed):
         assert isinstance(turning_speed, numbers.Number)
-        self.left     = -turning_speed
-        self.straight =  0.
-        self.right    =  turning_speed
+        self.__left     = -turning_speed
+        self.__straight =  0.
+        self.__right    =  turning_speed
+        
+    def set_speed(self, turning_speed):
+        self.__left     = -turning_speed
+        self.__right    =  turning_speed
+        
+    def get_left(self):
+        return self.__left
+    def get_straight(self):
+        return self.__straight
+    def get_right(self):
+        return self.__right
         
     
 class DiscreteAction():
@@ -116,20 +146,28 @@ class DiscreteAction():
         assert isinstance(medium_speed, numbers.Number)
         assert isinstance(fast_speed, numbers.Number)
         assert isinstance(turning_speed, numbers.Number)
-        self.translation_speed = TranslationSpeed(slow_speed, medium_speed, fast_speed)
-        self.turning_speed     = TurningSpeed(turning_speed)
+        self.__translation_speed = TranslationSpeed(slow_speed, medium_speed, fast_speed)
+        self.__turning_speed     = TurningSpeed(turning_speed)
         
-        self.action_list = []
-        self.action_list.append(np.array([self.translation_speed.slow,   self.turning_speed.left]))
-        self.action_list.append(np.array([self.translation_speed.slow,   self.turning_speed.straight]))
-        self.action_list.append(np.array([self.translation_speed.slow,   self.turning_speed.right]))
-        self.action_list.append(np.array([self.translation_speed.medium, self.turning_speed.left]))
-        self.action_list.append(np.array([self.translation_speed.medium, self.turning_speed.straight]))
-        self.action_list.append(np.array([self.translation_speed.medium, self.turning_speed.right]))
-        self.action_list.append(np.array([self.translation_speed.fast,   self.turning_speed.left]))
-        self.action_list.append(np.array([self.translation_speed.fast,   self.turning_speed.straight]))
-        self.action_list.append(np.array([self.translation_speed.fast,   self.turning_speed.right]))
+        self.__action_list = []
+        self.__action_list.append(np.array([self.__translation_speed.get_slow(),   self.__turning_speed.get_left()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_slow(),   self.__turning_speed.get_straight()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_slow(),   self.__turning_speed.get_right()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_medium(), self.__turning_speed.get_left()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_medium(), self.__turning_speed.get_straight()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_medium(), self.__turning_speed.get_right()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_fast(),   self.__turning_speed.get_left()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_fast(),   self.__turning_speed.get_straight()]))
+        self.__action_list.append(np.array([self.__translation_speed.get_fast(),   self.__turning_speed.get_right()]))
+        
+        self.action_length = len(self.__action_list[0])
+        self.number_of_available_action = len(self.__action_list)
+        
+    def get_action(self, action_number):
+        assert (action_number >= 0) and (action_number < self.number_of_available_action) 
+        return self.__action_list[action_number]
     
+        
 class SimpleRobotEnv():
     def __init__(self):
         self.dt = .1 # timestep
@@ -161,8 +199,7 @@ class SimpleRobotEnv():
         self.robot = SimpleRobot(pos_x, pos_y, phi)
         
         #List discrete actions for RL
-        self.discrete_action_list = DiscreteAction(0.3, 0.6, 0.9, np.pi/8).action_list
-        self.discrete_action_size = len(self.discrete_action_list)
+        self.rl_actions = DiscreteAction(0.3, 0.6, 0.9, np.pi/8)
         
         self.reset()
         self.state_size = len(self.get_state())
@@ -240,7 +277,7 @@ class SimpleRobotEnv():
     
     def reset(self):
         # Reset robot to to pre-defined position 
-        self.action = self.discrete_action_list[1]
+        self.action = self.rl_actions.get_action(1)
         pos_x, pos_y, phi = self.get_random_position()
         self.robot.set_robot_position(pos_x, pos_y, phi)
         return self.get_state()
@@ -275,7 +312,7 @@ class SimpleRobotEnv():
         # It consider the closest distance of the obstacle
         # and multiply by the speed so risky dangerous situation is penalized more with faster speed 
         # and safe situation is rewarded more with faster speed
-        assert len(state) == self.robot.n_fov_zones + len(self.discrete_action_list[1])
+        assert len(state) == self.robot.n_fov_zones + self.rl_actions.action_length
         
         closest_distance = np.min(state[:self.robot.n_fov_zones]) #get the closest distance from all sensors
         robot_linear_speed = state[self.robot.n_fov_zones]
@@ -309,12 +346,12 @@ class SimpleRobotEnv():
     
     def discrete_action(self,action_number):
         # Select pre-defined discrete action for RL
-        assert (action_number >= 0) and action_number < self.discrete_action_size
-        return self.discrete_action_list[action_number]
+        assert (action_number >= 0) and action_number < self.rl_actions.number_of_available_action
+        return self.rl_actions.get_action(action_number)
     
     def discrete_step(self,action_number):
         # Run step function using discrete action
-        assert (action_number >= 0) and action_number < self.discrete_action_size
+        assert (action_number >= 0) and action_number < self.rl_actions.number_of_available_action
         action = self.discrete_action(action_number)
         return self.step(action)
     
