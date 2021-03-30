@@ -38,8 +38,8 @@ class testing_vehicle(unittest.TestCase):
 		print('test vehicle environment')		
 		env  = SimpleVehicle()
 		
-		self.assertIsNone(env.fig)
-		self.assertIsNone(env.ax)			
+		self.assertIsNone(env.getFig())
+		self.assertIsNone(env.getAx())			
 		
 		self.assertGreater(env.x_axis_limit[1], env.x_axis_limit[0], 'lower x-limit is greater than higher x-limit')
 		self.assertGreater(env.y_axis_limit[1], env.y_axis_limit[0], 'lower y-limit is greater than higher y-limit')

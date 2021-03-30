@@ -11,8 +11,8 @@ class SimpleVehicle():
 		#solver timestep
 		self.dt = .05
 		
-		self.fig = None #
-		self.ax = None # 
+		self.__fig = None #
+		self.__ax = None # 
 				
 		self.x_axis_limit = [-15, 15] # bound on x 
 		self.y_axis_limit = [-2.5, 27.5] # bound on y
@@ -58,6 +58,12 @@ class SimpleVehicle():
 		self.obstacles.append(box(7,12,10,15))        		
 		self.ox1, self.oy1 = self.obstacles[0].exterior.xy
 		self.ox2, self.oy2 = self.obstacles[1].exterior.xy
+
+	def getFig(self):
+		return self.__fig
+	
+	def getAx(self):
+		return self.__ax
 
 	# for giving initial condition
 	# chosen randomly
@@ -193,31 +199,31 @@ class SimpleVehicle():
 		return parking_scale
 		
 	def render(self):
-		if self.fig is None:
-			assert self.ax is None
-			self.fig, self.ax = plt.subplots()
+		if self.__fig is None:
+			assert self.__ax is None
+			self.__fig, self.__ax = plt.subplots()
 		
 		# plotting border and dot on vehicle and walls	
-		if not self.ax.lines:
-			self.ax.plot([], [], "C0", linewidth=3)
+		if not self.__ax.lines:
+			self.__ax.plot([], [], "C0", linewidth=3)
 			for _ in range(4):
-				self.ax.plot([], [], "C1", linewidth=3)
-			self.ax.plot([], [], "C2o", markersize=6)
+				self.__ax.plot([], [], "C1", linewidth=3)
+			self.__ax.plot([], [], "C2o", markersize=6)
 		
 			x = np.linspace(-15, 15, 1000)
 			y = self._border_fcn(x)
-			self.ax.plot(x, y, "C3", linewidth=3) # plot red wall
-			self.ax.plot([0], [0], "C3o", markersize=6) # plot red dot on parking
+			self.__ax.plot(x, y, "C3", linewidth=3) # plot red wall
+			self.__ax.plot([0], [0], "C3o", markersize=6) # plot red dot on parking
 	
-			self.ax.grid()
-			self.ax.set_xlim(self.x_axis_limit)
-			self.ax.set_aspect("equal")
-			self.ax.set_ylim(self.y_axis_limit)
+			self.__ax.grid()
+			self.__ax.set_xlim(self.x_axis_limit)
+			self.__ax.set_aspect("equal")
+			self.__ax.set_ylim(self.y_axis_limit)
 			
-			self.ax.plot(self.ox1, self.oy1)
-			self.ax.plot(self.ox2, self.oy2)					
+			self.__ax.plot(self.ox1, self.oy1)
+			self.__ax.plot(self.ox2, self.oy2)					
 					
-		vehicle_body_box, left_front_wheel, right_front_wheel, left_rear_wheel, right_rear_wheel, rear_axle_center = self.ax.lines[:6]
+		vehicle_body_box, left_front_wheel, right_front_wheel, left_rear_wheel, right_rear_wheel, rear_axle_center = self.__ax.lines[:6]
 						
 		# plotting vehicle's parts
 		tmp = self.vehicle_body()
@@ -268,8 +274,8 @@ class SimpleVehicle():
 	
 		rear_axle_center.set_data([x], [y]) # 
 	
-		self.ax.relim() # 
-		self.ax.autoscale_view()
+		self.__ax.relim() # 
+		self.__ax.autoscale_view()
 		plt.draw()
 		
 		# process delay
