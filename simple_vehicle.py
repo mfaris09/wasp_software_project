@@ -154,13 +154,13 @@ class SimpleVehicle():
 
 	# define vehicle size
 	def vehicle_body(self):
-		bbox = np.array([
+		vehicle_body_box = np.array([
 			[self.vehicle_mid_length + self.vehicle_front_length,  .5 * self.vehicle_width],
 			[self.vehicle_mid_length + self.vehicle_front_length, -.5 * self.vehicle_width],
 			[        -self.vehicle_rear_length, -.5 * self.vehicle_width],
 			[        -self.vehicle_rear_length,  .5 * self.vehicle_width]
 		])
-		return bbox
+		return vehicle_body_box
 
 	# rear wheel function
 	def _rear_wheel(self):
