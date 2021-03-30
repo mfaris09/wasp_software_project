@@ -150,6 +150,7 @@ class SimpleVehicle():
 		return action
 
 	def discrete_step(self,action_number):
+		assert (action_number >= 0) and action_number < len(self.action_list)				
 		action = self.discrete_action(action_number)
 		discrete_step = self.step(action)
 		# print('discrete step :', discrete_step)
