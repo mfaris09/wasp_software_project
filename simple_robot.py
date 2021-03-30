@@ -91,6 +91,44 @@ class SimpleRobot():
     def get_robot_sensors(self):
         self.robot_sensors = self.get_parts(self.obstacle_map)
         return self.robot_sensors
+
+class TranslationSpeed():
+    def __init__(self, slow, medium, fast):
+        assert isinstance(slow, numbers.Number)
+        assert isinstance(medium, numbers.Number)
+        assert isinstance(fast, numbers.Number)
+        #translation speed
+        self.slow   = slow
+        self.medium = medium
+        self.fast   = fast
+        
+class TurningSpeed():
+    def __init__(self, turning_speed):
+        assert isinstance(turning_speed, numbers.Number)
+        self.left     = -turning_speed
+        self.straight =  0.
+        self.right    =  turning_speed
+        
+    
+class DiscreteAction():
+    def __init__(self, slow_speed, medium_speed, fast_speed, turning_speed):
+        assert isinstance(slow_speed, numbers.Number)
+        assert isinstance(medium_speed, numbers.Number)
+        assert isinstance(fast_speed, numbers.Number)
+        assert isinstance(turning_speed, numbers.Number)
+        self.translation_speed = TranslationSpeed(slow_speed, medium_speed, fast_speed)
+        self.turning_speed     = TurningSpeed(turning_speed)
+        
+        self.action_list = []
+        self.action_list.append(np.array([self.translation_speed.slow,   self.turning_speed.left]))
+        self.action_list.append(np.array([self.translation_speed.slow,   self.turning_speed.straight]))
+        self.action_list.append(np.array([self.translation_speed.slow,   self.turning_speed.right]))
+        self.action_list.append(np.array([self.translation_speed.medium, self.turning_speed.left]))
+        self.action_list.append(np.array([self.translation_speed.medium, self.turning_speed.straight]))
+        self.action_list.append(np.array([self.translation_speed.medium, self.turning_speed.right]))
+        self.action_list.append(np.array([self.translation_speed.fast,   self.turning_speed.left]))
+        self.action_list.append(np.array([self.translation_speed.fast,   self.turning_speed.straight]))
+        self.action_list.append(np.array([self.translation_speed.fast,   self.turning_speed.right]))
     
 class SimpleRobotEnv():
     def __init__(self):
@@ -123,7 +161,8 @@ class SimpleRobotEnv():
         self.robot = SimpleRobot(pos_x, pos_y, phi)
         
         #List discrete actions for RL
-        self.discrete_action_list = []
+        self.discrete_action_list = DiscreteAction(0.3, 0.6, 0.9, np.pi/8).action_list
+        '''
         slow_speed   = 0.3
         medium_speed = 0.6
         fast_speed   = 0.9
@@ -139,6 +178,7 @@ class SimpleRobotEnv():
         self.discrete_action_list.append(np.array([fast_speed, turn_left]))
         self.discrete_action_list.append(np.array([fast_speed, straight]))
         self.discrete_action_list.append(np.array([fast_speed, turn_right]))
+        '''
         self.discrete_action_size = len(self.discrete_action_list)
         
         self.reset()
