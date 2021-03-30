@@ -157,11 +157,12 @@ class SimpleVehicle():
 
 	# define vehicle size
 	def vehicle_body(self):
+		body_scale = .5		
 		vehicle_body_box = np.array([
-			[self.vehicle_mid_length + self.vehicle_front_length,  .5 * self.vehicle_width],
-			[self.vehicle_mid_length + self.vehicle_front_length, -.5 * self.vehicle_width],
-			[        -self.vehicle_rear_length, -.5 * self.vehicle_width],
-			[        -self.vehicle_rear_length,  .5 * self.vehicle_width]
+			[self.vehicle_mid_length + self.vehicle_front_length, body_scale * self.vehicle_width],
+			[self.vehicle_mid_length + self.vehicle_front_length, -body_scale * self.vehicle_width],
+			[        -self.vehicle_rear_length, -body_scale * self.vehicle_width],
+			[        -self.vehicle_rear_length,  body_scale * self.vehicle_width]
 		])
 		return vehicle_body_box
 
