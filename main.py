@@ -15,8 +15,8 @@ import json
 
 EPISODES = 3000
 
-env  = SimpleRobotEnv()
-#env  = SimpleVehicle()
+#env  = SimpleRobotEnv()
+env  = SimpleVehicle()
 state_size = env.state_size
 action_size = env.discrete_action_size
 agent = ReinforceAgent(state_size, action_size)

@@ -14,8 +14,8 @@ class SimpleVehicle():
 		self.fig = None #
 		self.ax = None # 
 				
-		self.xlim = [-15, 15] # bound on x 
-		self.ylim = [-2.5, 27.5] # bound on y
+		self.x_axis_limit = [-15, 15] # bound on x 
+		self.y_axis_limit = [-2.5, 27.5] # bound on y
 		
 		# physical parameters
 		self.vehicle_mid_length = 2.815 
@@ -82,8 +82,8 @@ class SimpleVehicle():
 	def set_vehicle_position(self, pos_x, pos_y, direction):	
 		self.action = np.array([0., np.pi / 4.])
 		
-		assert self.xlim[0] < pos_x < self.xlim[1]
-		assert 10. < pos_y < self.ylim[1]
+		assert self.x_axis_limit[0] < pos_x < self.x_axis_limit[1]
+		assert 10. < pos_y < self.y_axis_limit[1]
 		assert direction < 2*np.pi
 
 		# initial states: pos x, pos y, direct
@@ -131,10 +131,10 @@ class SimpleVehicle():
 
 		# done condition: pass within parking line or hit the boundaries, wall, obstacles 
 		done = (self._border_fcn(tmp[:, 0]) > tmp[:, 1]).any() \
-                or (tmp[:, 0] < self.xlim[0]).any() \
-                or (tmp[:, 0] > self.xlim[1]).any() \
-                or (tmp[:, 1] < self.ylim[0]).any() \
-				or (tmp[:, 1] > self.ylim[1]).any() \
+                or (tmp[:, 0] < self.x_axis_limit[0]).any() \
+                or (tmp[:, 0] > self.x_axis_limit[1]).any() \
+                or (tmp[:, 1] < self.y_axis_limit[0]).any() \
+				or (tmp[:, 1] > self.y_axis_limit[1]).any() \
 				or ((tmp[:, 0] > min(self.ox1)).any() and (tmp[:, 0] < max(self.ox1)).any() and (tmp[:, 1] > min(self.oy1)).any() and (tmp[:, 1] < max(self.oy1)).any()) \
 				or ((tmp[:, 0] > min(self.ox2)).any() and (tmp[:, 0] < max(self.ox2)).any() and (tmp[:, 1] > min(self.oy2)).any() and (tmp[:, 1] < max(self.oy2)).any())
 								
@@ -205,9 +205,9 @@ class SimpleVehicle():
 			self.ax.plot([0], [0], "C3o", markersize=6) # plot red dot on parking
 	
 			self.ax.grid()
-			self.ax.set_xlim(self.xlim)
+			self.ax.set_xlim(self.x_axis_limit)
 			self.ax.set_aspect("equal")
-			self.ax.set_ylim(self.ylim)
+			self.ax.set_ylim(self.y_axis_limit)
 			
 			self.ax.plot(self.ox1, self.oy1)
 			self.ax.plot(self.ox2, self.oy2)					

@@ -41,8 +41,8 @@ class testing_vehicle(unittest.TestCase):
 		self.assertIsNone(env.fig)
 		self.assertIsNone(env.ax)			
 		
-		self.assertGreater(env.xlim[1], env.xlim[0], 'lower x-limit is greater than higher x-limit')
-		self.assertGreater(env.ylim[1], env.ylim[0], 'lower y-limit is greater than higher y-limit')
+		self.assertGreater(env.x_axis_limit[1], env.x_axis_limit[0], 'lower x-limit is greater than higher x-limit')
+		self.assertGreater(env.y_axis_limit[1], env.y_axis_limit[0], 'lower y-limit is greater than higher y-limit')
 		
 		self.assertGreater(env.dt, 0., 'sampling time is zero')
 	
@@ -183,10 +183,10 @@ class testing_vehicle(unittest.TestCase):
 		action = agent.getAction(state)
 		next_state, reward, done = env.discrete_step(action)		
 		if (env._border_fcn(env.tmpstep[:, 0]) > env.tmpstep[:, 1]).any() \
-                or (env.tmpstep[:, 0] < env.xlim[0]).any() \
-                or (env.tmpstep[:, 0] > env.xlim[1]).any() \
-                or (env.tmpstep[:, 1] < env.ylim[0]).any() \
-				or (env.tmpstep[:, 1] > env.ylim[1]).any() \
+                or (env.tmpstep[:, 0] < env.x_axis_limit[0]).any() \
+                or (env.tmpstep[:, 0] > env.x_axis_limit[1]).any() \
+                or (env.tmpstep[:, 1] < env.y_axis_limit[0]).any() \
+				or (env.tmpstep[:, 1] > env.y_axis_limit[1]).any() \
 				or ((env.tmpstep[:, 0] > min(env.ox1)).any() and (env.tmpstep[:, 0] < max(env.ox1)).any() and (env.tmpstep[:, 1] > min(env.oy1)).any() and (env.tmpstep[:, 1] < max(env.oy1)).any()) \
 				or ((env.tmpstep[:, 0] > min(env.ox2)).any() and (env.tmpstep[:, 0] < max(env.ox2)).any() and (env.tmpstep[:, 1] > min(env.oy2)).any() and (env.tmpstep[:, 1] < max(env.oy2)).any()):		  				 					
 			self.assertTrue(done, 'done is False')
