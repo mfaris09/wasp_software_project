@@ -148,6 +148,14 @@ class SimpleRobotEnv():
         assert self.axes is None
         self.figure, self.axes = plt.subplots()
         
+    def plot_object(self, objects_list, color=None):
+        for object in objects_list:
+            x, y = object.exterior.xy
+            if color == None:
+                self.axes.plot(x, y)
+            else:
+                self.axes.plot(x, y, color)            
+        
     def init_axes(self):
         self.axes.plot([], [], "C0", linewidth=3)
         for _ in range(4):
@@ -158,18 +166,10 @@ class SimpleRobotEnv():
         self.axes.set_xlim(self.limit_x_axis)
         self.axes.set_aspect("equal")
         self.axes.set_ylim(self.limit_y_axis)
-    
-        for obstacle in self.obstacles:
-            x,y = obstacle.exterior.xy
-            self.axes.plot(x, y)
-            
-        for body in self.robot.get_robot_body():
-            x,y = body.exterior.xy
-            self.axes.plot(x, y, 'k')
         
-        for sensor in self.robot.get_robot_sensors():
-            x,y = sensor.exterior.xy
-            self.axes.plot(x, y, 'silver')
+        self.plot_object(self.obstacles)
+        self.plot_object(self.robot.get_robot_body(), 'k')
+        self.plot_object(self.robot.get_robot_sensors(), 'silver')
             
     def render(self, hold=False):
         # Draw the plot so we can see the visualization
