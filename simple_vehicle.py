@@ -212,7 +212,7 @@ class SimpleVehicle():
 			self.ax.plot(self.ox1, self.oy1)
 			self.ax.plot(self.ox2, self.oy2)					
 					
-		bbox, lfw, rfw, lrw, rrw, center = self.ax.lines[:6]
+		vehicle_body_box, left_front_wheel, right_front_wheel, left_rear_wheel, right_rear_wheel, rear_axle_center = self.ax.lines[:6]
 						
 		# plotting vehicle's parts
 		tmp = self.vehicle_body()
@@ -223,7 +223,7 @@ class SimpleVehicle():
 		tmp += np.array([[x, y]])
 		# repeat to close the drawed object
 		tmp = np.concatenate([tmp, tmp[[0]]])
-		bbox.set_data(tmp.T)
+		vehicle_body_box.set_data(tmp.T)
 
 		# left front wheel	
 		tmp = self._front_wheel()
@@ -232,7 +232,7 @@ class SimpleVehicle():
 		tmp = np.dot(tmp, rotation_matrix(theta))
 		# translate
 		tmp += np.array([[x, y]])
-		lfw.set_data(tmp.T) 
+		left_front_wheel.set_data(tmp.T) 
 
 		# right front wheel		
 		tmp = self._front_wheel()
@@ -241,7 +241,7 @@ class SimpleVehicle():
 		tmp = np.dot(tmp, rotation_matrix(theta))
 		# translate
 		tmp += np.array([[x, y]])
-		rfw.set_data(tmp.T) 
+		right_front_wheel.set_data(tmp.T) 
 	
 		# left rear wheel	
 		tmp = self._rear_wheel()
@@ -250,7 +250,7 @@ class SimpleVehicle():
 		tmp = np.dot(tmp, rotation_matrix(theta))
 		# translate
 		tmp += np.array([[x, y]])
-		lrw.set_data(tmp.T) 
+		left_rear_wheel.set_data(tmp.T) 
 		
 		# right rear wheel	
 		tmp = self._rear_wheel()
@@ -259,9 +259,9 @@ class SimpleVehicle():
 		tmp = np.dot(tmp, rotation_matrix(theta))
 		# translate
 		tmp += np.array([[x, y]])
-		rrw.set_data(tmp.T) 
+		right_rear_wheel.set_data(tmp.T) 
 	
-		center.set_data([x], [y]) # 
+		rear_axle_center.set_data([x], [y]) # 
 	
 		self.ax.relim() # 
 		self.ax.autoscale_view()
