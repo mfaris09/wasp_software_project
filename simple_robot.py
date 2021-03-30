@@ -162,23 +162,6 @@ class SimpleRobotEnv():
         
         #List discrete actions for RL
         self.discrete_action_list = DiscreteAction(0.3, 0.6, 0.9, np.pi/8).action_list
-        '''
-        slow_speed   = 0.3
-        medium_speed = 0.6
-        fast_speed   = 0.9
-        turn_left  = -np.pi/8
-        straight   = 0.
-        turn_right = np.pi/8
-        self.discrete_action_list.append(np.array([slow_speed, turn_left]))
-        self.discrete_action_list.append(np.array([slow_speed, straight]))
-        self.discrete_action_list.append(np.array([slow_speed, turn_right]))
-        self.discrete_action_list.append(np.array([medium_speed, turn_left]))
-        self.discrete_action_list.append(np.array([medium_speed, straight]))
-        self.discrete_action_list.append(np.array([medium_speed, turn_right]))
-        self.discrete_action_list.append(np.array([fast_speed, turn_left]))
-        self.discrete_action_list.append(np.array([fast_speed, straight]))
-        self.discrete_action_list.append(np.array([fast_speed, turn_right]))
-        '''
         self.discrete_action_size = len(self.discrete_action_list)
         
         self.reset()
