@@ -279,4 +279,6 @@ class SimpleVehicle():
 		plt.draw()
 		
 		# process delay
-		plt.pause(1e-07)			
+		plot_delay = 1e-07 
+		plt.pause(plot_delay)			
+
