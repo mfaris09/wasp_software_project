@@ -144,6 +144,33 @@ class SimpleRobotEnv():
         self.reset()
         self.state_size = len(self.get_state())
         
+    def init_figure(self):
+        assert self.axes is None
+        self.figure, self.axes = plt.subplots()
+        
+    def init_axes(self):
+        self.axes.plot([], [], "C0", linewidth=3)
+        for _ in range(4):
+            self.axes.plot([], [], "C1", linewidth=3)
+        self.axes.plot([], [], "C2o", markersize=6)
+
+        self.axes.grid()
+        self.axes.set_xlim(self.limit_x_axis)
+        self.axes.set_aspect("equal")
+        self.axes.set_ylim(self.limit_y_axis)
+    
+        for obstacle in self.obstacles:
+            x,y = obstacle.exterior.xy
+            self.axes.plot(x, y)
+            
+        for body in self.robot.get_robot_body():
+            x,y = body.exterior.xy
+            self.axes.plot(x, y, 'k')
+        
+        for sensor in self.robot.get_robot_sensors():
+            x,y = sensor.exterior.xy
+            self.axes.plot(x, y, 'silver')
+            
     def render(self, hold=False):
         # Draw the plot so we can see the visualization
         assert type(hold) == bool
@@ -155,30 +182,10 @@ class SimpleRobotEnv():
                 plot_data[i].set_data(updated_data[i].exterior.xy)
         
         if self.figure is None:
-            assert self.axes is None
-            self.figure, self.axes = plt.subplots()
-        if not self.axes.lines:
-            self.axes.plot([], [], "C0", linewidth=3)
-            for _ in range(4):
-                self.axes.plot([], [], "C1", linewidth=3)
-            self.axes.plot([], [], "C2o", markersize=6)
-
-            self.axes.grid()
-            self.axes.set_xlim(self.limit_x_axis)
-            self.axes.set_aspect("equal")
-            self.axes.set_ylim(self.limit_y_axis)
-        
-            for obstacle in self.obstacles:
-                x,y = obstacle.exterior.xy
-                self.axes.plot(x, y)
-                
-            for body in self.robot.get_robot_body():
-                x,y = body.exterior.xy
-                self.axes.plot(x, y, 'k')
+            self.init_figure()
             
-            for sensor in self.robot.get_robot_sensors():
-                x,y = sensor.exterior.xy
-                self.axes.plot(x, y, 'silver')
+        if not self.axes.lines:
+            self.init_axes()
                 
         # Retrieve robot's plot so it moves after initiated
         # This is to avoid redrawing the plot every cycle
@@ -215,6 +222,10 @@ class SimpleRobotEnv():
         self.robot.set_robot_position(pos_x, pos_y, phi)
         return self.get_state()
     
+    def get_closest_obstacle_distance(self, obstacle_object, obstacle_distance, robot_center, sensor_zone):
+        intersection_poylgon  = obstacle_object.intersection(sensor_zone)
+        return min(obstacle_distance, robot_center.distance(intersection_poylgon))
+    
     def get_state(self):
         # Get the state of the robot that contains:
         # 1. list of Sensor readings with the size equals to robot.n_fov_zones
@@ -225,8 +236,7 @@ class SimpleRobotEnv():
         for obstacle in self.obstacles:
             for i in range(self.robot.n_fov_zones):
                 if obstacle.intersects(self.robot.robot_sensors[i]):
-                    intersection_poylgon = obstacle.intersection(self.robot.robot_sensors[i])
-                    obstacle_distances[i] = min(obstacle_distances[i], robot_center.distance(intersection_poylgon))
+                    obstacle_distances[i] = self.get_closest_obstacle_distance(obstacle, obstacle_distances[i], robot_center, self.robot.robot_sensors[i])
         return np.concatenate((obstacle_distances, self.action))
     
     def check_collision(self):
