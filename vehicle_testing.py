@@ -171,9 +171,7 @@ class testing_vehicle(unittest.TestCase):
 		
 		self.assertGreater(reward,0.001, 'reward is greater than 0.001')
 
-	# test done condition
-	def test_done_condition(self):
-		print('check done condition')
+	def condition_done(self):
 		env = SimpleVehicle()
 		state = env.reset()		
 		state_size = env.state_size
@@ -182,13 +180,24 @@ class testing_vehicle(unittest.TestCase):
 		
 		action = agent.getAction(state)
 		next_state, reward, done = env.discrete_step(action)		
-		if (env._border_fcn(env.tmpstep[:, 0]) > env.tmpstep[:, 1]).any() \
+		
+		condition_done = (env._border_fcn(env.tmpstep[:, 0]) > env.tmpstep[:, 1]).any() \
                 or (env.tmpstep[:, 0] < env.x_axis_limit[0]).any() \
                 or (env.tmpstep[:, 0] > env.x_axis_limit[1]).any() \
                 or (env.tmpstep[:, 1] < env.y_axis_limit[0]).any() \
 				or (env.tmpstep[:, 1] > env.y_axis_limit[1]).any() \
 				or ((env.tmpstep[:, 0] > min(env.ox1)).any() and (env.tmpstep[:, 0] < max(env.ox1)).any() and (env.tmpstep[:, 1] > min(env.oy1)).any() and (env.tmpstep[:, 1] < max(env.oy1)).any()) \
-				or ((env.tmpstep[:, 0] > min(env.ox2)).any() and (env.tmpstep[:, 0] < max(env.ox2)).any() and (env.tmpstep[:, 1] > min(env.oy2)).any() and (env.tmpstep[:, 1] < max(env.oy2)).any()):		  				 					
+				or ((env.tmpstep[:, 0] > min(env.ox2)).any() and (env.tmpstep[:, 0] < max(env.ox2)).any() and (env.tmpstep[:, 1] > min(env.oy2)).any() and (env.tmpstep[:, 1] < max(env.oy2)).any())
+		
+		return done, condition_done
+
+	# test done condition
+	def test_done_condition(self):
+		print('check done condition')
+		
+		done, condition_done = self.condition_done()
+		
+		if condition_done:		  				 					
 			self.assertTrue(done, 'done is False')
 		else:
 			self.assertFalse(done, 'done is True')
