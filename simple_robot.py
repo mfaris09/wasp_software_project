@@ -2,9 +2,13 @@ import numpy as np
 from shapely.geometry import Point, box, Polygon
 from shapely.affinity import translate, rotate
 import matplotlib.pyplot as plt
+import numbers
 
 class SimpleRobot():
     def __init__(self, pos_x, pos_y, phi):
+        assert isinstance(pos_x, numbers.Number)
+        assert isinstance(pos_y, numbers.Number)
+        assert isinstance(phi,   numbers.Number)
         self.set_robot_position(pos_x, pos_y, phi)
         self.wheel_distance   = 2.0 #distance between 2 wheels 
         self.wheel_radius     = 0.8 
@@ -52,12 +56,18 @@ class SimpleRobot():
         
     def set_robot_position(self, pos_x, pos_y, phi):
         # Set robot position manually by giving the new position
+        assert isinstance(pos_x, numbers.Number)
+        assert isinstance(pos_y, numbers.Number)
+        assert isinstance(phi,   numbers.Number)
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.phi = phi
         
     def move(self, linear_speed, angular_speed, timestep):
         # Calculate robot position from the given speed and timestep which is based on differential drive kinematics
+        assert isinstance(linear_speed,  numbers.Number)
+        assert isinstance(angular_speed, numbers.Number)
+        assert isinstance(timestep,      numbers.Number)
         self.pos_x += linear_speed*np.cos(self.phi)*timestep
         self.pos_y += linear_speed*np.sin(self.phi)*timestep
         self.phi   += angular_speed*timestep
@@ -65,6 +75,8 @@ class SimpleRobot():
     
     def get_parts(self, part_list):
         # collect all relevant components given in the part_list
+        assert len(part_list) > 0
+        
         moved_parts = []
         for part in part_list:
             rotated_part =  rotate(part, self.phi, use_radians=True, origin=self.robot_rotation_point)
@@ -134,6 +146,7 @@ class SimpleRobotEnv():
         
     def render(self, hold=False):
         # Draw the plot so we can see the visualization
+        assert type(hold) == bool
         def matching_plot(plot_data, updated_data):
             # matching the plot with robot component
             # this helper function is used for animating the robot movement
@@ -229,6 +242,8 @@ class SimpleRobotEnv():
         # It consider the closest distance of the obstacle
         # and multiply by the speed so risky dangerous situation is penalized more with faster speed 
         # and safe situation is rewarded more with faster speed
+        assert len(state) == self.robot.n_fov_zones + len(self.discrete_action_list[1])
+        
         closest_distance = np.min(state[:self.robot.n_fov_zones]) #get the closest distance from all sensors
         robot_linear_speed = state[self.robot.n_fov_zones]
         if self.check_collision():
@@ -247,6 +262,8 @@ class SimpleRobotEnv():
         # step function for RL
         # The input is an action and returning state, reward and done status
         # done is set true when the robot collides with obstacle
+        assert len(action) == 2
+        
         linear_speed, angular_speed = action
         self.action = action 
         
@@ -264,6 +281,7 @@ class SimpleRobotEnv():
     
     def discrete_step(self,action_number):
         # Run step function using discrete action
+        assert (action_number >= 0) and action_number < self.discrete_action_size
         action = self.discrete_action(action_number)
         return self.step(action)
     
