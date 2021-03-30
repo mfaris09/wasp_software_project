@@ -6,13 +6,22 @@ import matplotlib.pyplot as plt
 class SimpleRobot():
     def __init__(self, pos_x, pos_y, phi):
         self.set_robot_position(pos_x, pos_y, phi)
-        self.wheel_distance = 2.0 #distance between 2 wheels 
-        self.wheel_radius = 0.8 
-        self.init_robot_body = []
-        self.init_robot_body.append(Point(0,0).buffer(1.5)) #outer circle body
-        self.init_robot_body.append(box(-1.1, -self.wheel_radius, -0.9, self.wheel_radius)) #left wheel
-        self.init_robot_body.append(box( 0.9, -self.wheel_radius,  1.1, self.wheel_radius)) #right wheel
-        self.init_robot_body.append(Polygon([(-0.6, 1),(0, 1.3),(0.6, 1)])) #triangle as the front marker
+        self.wheel_distance   = 2.0 #distance between 2 wheels 
+        self.wheel_radius     = 0.8 
+        self.init_robot_body  = []
+        robot_center_point    = (0,0)
+        robot_radius          = 1.5
+        robot_wheel_inner_pos = 0.9
+        robot_wheel_outer_pos = 1.1
+        self.init_robot_body.append(Point(robot_center_point).buffer(robot_radius)) #outer circle body
+        self.init_robot_body.append(box(-robot_wheel_outer_pos, -self.wheel_radius, -robot_wheel_inner_pos, self.wheel_radius)) #left wheel
+        self.init_robot_body.append(box( robot_wheel_inner_pos, -self.wheel_radius,  robot_wheel_outer_pos, self.wheel_radius)) #right wheel
+        # adding triangle as the front marker
+        triangle_left_corner  = (-0.6, 1)
+        triangle_top_corner   = (0, 1.3)
+        triangle_right_corner = (0.6, 1)
+        
+        self.init_robot_body.append(Polygon([triangle_left_corner, triangle_top_corner, triangle_right_corner])) 
         
         # Robot sensor
         self.camera_near_clipping = 1.5 #in meters
@@ -31,11 +40,12 @@ class SimpleRobot():
                                     [self.camera_far_clipping*np.sin(np.radians(self.fov_zones_list[i])),  self.camera_far_clipping*np.cos(np.radians(self.fov_zones_list[i]))]]))
         
         # Rotating robot's components to rectify the robot drawing 
+        self.robot_rotation_point = Point(0, 0)
         angle_correction = -np.pi/2
         for i in range(len(self.init_robot_body)):
-            self.init_robot_body[i] = rotate(self.init_robot_body[i], angle_correction, use_radians=True, origin=Point(0, 0))
+            self.init_robot_body[i] = rotate(self.init_robot_body[i], angle_correction, use_radians=True, origin=self.robot_rotation_point)
         for i in range(len(self.obstacle_map)):
-            self.obstacle_map[i] = rotate(self.obstacle_map[i], angle_correction, use_radians=True, origin=Point(0, 0))
+            self.obstacle_map[i] = rotate(self.obstacle_map[i], angle_correction, use_radians=True, origin=self.robot_rotation_point)
         # Set self.robot_body and self.robot_sensors variables
         self.get_robot_body()
         self.get_robot_sensors()
@@ -57,7 +67,7 @@ class SimpleRobot():
         # collect all relevant components given in the part_list
         moved_parts = []
         for part in part_list:
-            rotated_part =  rotate(part, self.phi, use_radians=True, origin=Point(0, 0))
+            rotated_part =  rotate(part, self.phi, use_radians=True, origin=self.robot_rotation_point)
             translated_part = translate(rotated_part, self.pos_x, self.pos_y)
             moved_parts.append(translated_part)
         return moved_parts
@@ -75,7 +85,7 @@ class SimpleRobotEnv():
         self.dt = .1 # timestep
 
         self.figure = None
-        self.axes = None
+        self.axes   = None
 
         self.limit_x_axis = [-15, 15]
         self.limit_y_axis = [-2.5, 27.5]
@@ -92,7 +102,11 @@ class SimpleRobotEnv():
         self.obstacles.append(box(  0,20,10,21))
         self.obstacles.append(Point(3,12.5).buffer(2))
         
-        self.target_list = [[-10,2.5], [10,7.5], [-10, 20], [10,25]]
+        bottom_left_pos  = [-10, 2.5]
+        bottom_right_pos = [ 10, 7.5]
+        top_left_pos     = [-10, 20]
+        top_right_pos    = [ 10, 25]
+        self.target_list = [bottom_left_pos, bottom_right_pos, top_left_pos, top_right_pos]
         pos_x, pos_y, phi = self.get_random_position()
         self.robot = SimpleRobot(pos_x, pos_y, phi)
         
@@ -155,7 +169,8 @@ class SimpleRobotEnv():
                 
         # Retrieve robot's plot so it moves after initiated
         # This is to avoid redrawing the plot every cycle
-        obstacle_idx = 6 + len(self.obstacles)
+        initiated_object_plot = 6
+        obstacle_idx = initiated_object_plot + len(self.obstacles)
         robot_idx    = obstacle_idx + len(self.robot.get_robot_body())
         sensor_idx   = robot_idx + len(self.robot.get_robot_sensors())
         robot_body   = self.axes.lines[obstacle_idx:robot_idx]
@@ -165,8 +180,9 @@ class SimpleRobotEnv():
         
         self.axes.relim()
         self.axes.autoscale_view()
+        pause_time_for_plotting = 1e-07 # in seconds
         plt.draw()
-        plt.pause(1e-07)
+        plt.pause(pause_time_for_plotting)
         if hold:
             plt.show()
 
