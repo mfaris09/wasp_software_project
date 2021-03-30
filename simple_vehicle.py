@@ -84,7 +84,7 @@ class SimpleVehicle():
 		
 		assert self.x_axis_limit[0] < pos_x < self.x_axis_limit[1]
 		assert 10. < pos_y < self.y_axis_limit[1]
-		assert direction < 2*np.pi
+		assert 0. <= direction < 2*np.pi
 
 		# initial states: pos x, pos y, direct
 		# chosen to be andom within bounds
