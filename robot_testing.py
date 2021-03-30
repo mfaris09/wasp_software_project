@@ -15,7 +15,7 @@ class testing_robot(unittest.TestCase):
     def test_init(self):
         #testing if the rotation does not add more components
         self.assertEqual(len(self.robot.init_robot_body), 4)
-        self.assertEqual(len(self.robot.obstacle_map), self.robot.n_direction)
+        self.assertEqual(len(self.robot.obstacle_map), self.robot.n_fov_zones)
         
     def test_move(self):
         #testing if the robot moves in x-axis
@@ -48,22 +48,22 @@ class testing_robot(unittest.TestCase):
         robot_body    = self.robot.get_robot_body()
         robot_sensors = self.robot.get_robot_sensors()
         self.assertEqual(len(robot_body), 4, 'quantity of robot body incorrect')
-        self.assertEqual(len(robot_sensors), self.robot.n_direction, 'quantity of robot sensors incorrect')
+        self.assertEqual(len(robot_sensors), self.robot.n_fov_zones, 'quantity of robot sensors incorrect')
         
 class testing_environment(unittest.TestCase):
     env = SimpleRobotEnv()
     
     def test_init(self):
         test_env = SimpleRobotEnv()
-        self.assertGreater(test_env.xlim[1], test_env.xlim[0], 'x-axis is not define properly, xmax should > xmin')
-        self.assertGreater(test_env.ylim[1], test_env.ylim[0], 'y-axis is not define properly, ymax should > ymin')
+        self.assertGreater(test_env.limit_x_axis[1], test_env.limit_x_axis[0], 'x-axis is not define properly, xmax should > xmin')
+        self.assertGreater(test_env.limit_y_axis[1], test_env.limit_y_axis[0], 'y-axis is not define properly, ymax should > ymin')
         self.assertGreater(test_env.dt, 0., 'timestep must be greater than zero')
         self.assertGreater(len(test_env.obstacles), 0, 'there must be obstacles created to be avoided by the robot')
         
     def test_render(self):
         self.env.render(hold=False)
-        self.assertIsNotNone(self.env.fig, 'fig is None')
-        self.assertIsNotNone(self.env.ax,  'ax is None')
+        self.assertIsNotNone(self.env.figure, 'figure is None')
+        self.assertIsNotNone(self.env.axes,  'axes is None')
         
     def test_get_random_position(self):
         #test if the random position is correct
@@ -81,22 +81,22 @@ class testing_environment(unittest.TestCase):
     def test_get_state(self):
         #test if the state size is correct
         self.env.reset()
-        self.assertEqual(len(self.env.get_state()), self.env.robot.n_direction + 2, 'state size incorrect')
+        self.assertEqual(len(self.env.get_state()), self.env.robot.n_fov_zones + 2, 'state size incorrect')
         for i in range(100):
             pos_x, pos_y, phi = self.env.get_random_position()
             self.env.robot.set_robot_position(pos_x, pos_y, phi)
             state = self.env.get_state()
-            max_distance = np.max(state[:self.env.robot.n_direction])
+            max_distance = np.max(state[:self.env.robot.n_fov_zones])
             self.assertEqual(max_distance, self.env.robot.camera_far_clipping, 'sensor reading has problem, there must be a sensor that has max value (3.5)')
         #set the robot far from a wall, the sensor must have readings < camera_far_clipping
         self.env.robot.set_robot_position(10., 10., 0.)
         state = self.env.get_state()
-        min_distance = np.min(state[:self.env.robot.n_direction])
+        min_distance = np.min(state[:self.env.robot.n_fov_zones])
         self.assertEqual(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect when no obstacle')
         #set the robot near a wall, the sensor must have readings < camera_far_clipping
         self.env.robot.set_robot_position(12., 10., 0.)
         state = self.env.get_state()
-        min_distance = np.min(state[:self.env.robot.n_direction])
+        min_distance = np.min(state[:self.env.robot.n_fov_zones])
         self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
     
     def test_check_collision(self):
@@ -144,7 +144,7 @@ class testing_environment(unittest.TestCase):
         state, reward, done = self.env.step(action)
         self.assertLess(reward, 0., 'obstacle is near, reward must be negative')
         self.assertFalse(done, 'robot not in collision, boolean must be false')
-        min_distance = np.min(state[:self.env.robot.n_direction])
+        min_distance = np.min(state[:self.env.robot.n_fov_zones])
         self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
         # Move the robot forward until it collides to the wall
         for i in range(15):
@@ -160,7 +160,7 @@ class testing_environment(unittest.TestCase):
             state, reward, done = self.env.discrete_step(i)
             self.assertLess(reward, 0., 'obstacle is near, reward must be negative')
             self.assertFalse(done, 'robot not in collision, boolean must be false')
-            min_distance = np.min(state[:self.env.robot.n_direction])
+            min_distance = np.min(state[:self.env.robot.n_fov_zones])
             self.assertLess(min_distance, self.env.robot.camera_far_clipping, 'sensor reading incorrect with an obstacle')
             
 if __name__ == '__main__':

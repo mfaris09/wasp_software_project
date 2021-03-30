@@ -19,16 +19,16 @@ class SimpleRobot():
         self.camera_far_clipping  = 3.5 #in meters
         self.sensing_range        = self.camera_far_clipping - self.camera_near_clipping
         self.camera_fov_angle     = 90.0 #degree
-        self.n_direction          = 5 # number of simulated sensor. It can also be seen as how many zones that camera's Field of View (FoV) will be divided
-        self.direction_list       = np.linspace(-self.camera_fov_angle, self.camera_fov_angle, self.n_direction+1)
+        self.n_fov_zones          = 5 # number of simulated sensor. It can also be seen as how many zones that camera's Field of View (FoV) will be divided
+        self.fov_zones_list       = np.linspace(-self.camera_fov_angle, self.camera_fov_angle, self.n_fov_zones+1)
         self.obstacle_map = []
-        self.obstacle_distances = np.ones((self.n_direction))*self.camera_far_clipping
-        for i in range(self.n_direction):
+        self.obstacle_distances = np.ones((self.n_fov_zones))*self.camera_far_clipping
+        for i in range(self.n_fov_zones):
             self.obstacle_map.append(Polygon([
-                                    [self.camera_near_clipping*np.sin(np.radians(self.direction_list[i])),  self.camera_near_clipping*np.cos(np.radians(self.direction_list[i]))],
-                                    [self.camera_near_clipping*np.sin(np.radians(self.direction_list[i+1])),self.camera_near_clipping*np.cos(np.radians(self.direction_list[i+1]))],
-                                    [self.camera_far_clipping*np.sin(np.radians(self.direction_list[i+1])),self.camera_far_clipping*np.cos(np.radians(self.direction_list[i+1]))],
-                                    [self.camera_far_clipping*np.sin(np.radians(self.direction_list[i])),  self.camera_far_clipping*np.cos(np.radians(self.direction_list[i]))]]))
+                                    [self.camera_near_clipping*np.sin(np.radians(self.fov_zones_list[i])),  self.camera_near_clipping*np.cos(np.radians(self.fov_zones_list[i]))],
+                                    [self.camera_near_clipping*np.sin(np.radians(self.fov_zones_list[i+1])),self.camera_near_clipping*np.cos(np.radians(self.fov_zones_list[i+1]))],
+                                    [self.camera_far_clipping*np.sin(np.radians(self.fov_zones_list[i+1])),self.camera_far_clipping*np.cos(np.radians(self.fov_zones_list[i+1]))],
+                                    [self.camera_far_clipping*np.sin(np.radians(self.fov_zones_list[i])),  self.camera_far_clipping*np.cos(np.radians(self.fov_zones_list[i]))]]))
         
         # Rotating robot's components to rectify the robot drawing 
         angle_correction = -np.pi/2
@@ -74,18 +74,18 @@ class SimpleRobotEnv():
     def __init__(self):
         self.dt = .1 # timestep
 
-        self.fig = None
-        self.ax = None
+        self.figure = None
+        self.axes = None
 
-        self.xlim = [-15, 15]
-        self.ylim = [-2.5, 27.5]
+        self.limit_x_axis = [-15, 15]
+        self.limit_y_axis = [-2.5, 27.5]
         
         self.obstacles = []
         outer_wall_thick = 0.001
-        self.obstacles.append(box(self.xlim[0], self.ylim[0], self.xlim[1]+outer_wall_thick, self.ylim[0]+outer_wall_thick)) #outer wall
-        self.obstacles.append(box(self.xlim[0], self.ylim[0], self.xlim[0]+outer_wall_thick, self.ylim[1]+outer_wall_thick)) #outer wall
-        self.obstacles.append(box(self.xlim[0], self.ylim[1], self.xlim[1]+outer_wall_thick, self.ylim[1]+outer_wall_thick)) #outer wall
-        self.obstacles.append(box(self.xlim[1], self.ylim[0], self.xlim[1]+outer_wall_thick, self.ylim[1]+outer_wall_thick)) #outer wall
+        self.obstacles.append(box(self.limit_x_axis[0], self.limit_y_axis[0], self.limit_x_axis[1]+outer_wall_thick, self.limit_y_axis[0]+outer_wall_thick)) #outer wall
+        self.obstacles.append(box(self.limit_x_axis[0], self.limit_y_axis[0], self.limit_x_axis[0]+outer_wall_thick, self.limit_y_axis[1]+outer_wall_thick)) #outer wall
+        self.obstacles.append(box(self.limit_x_axis[0], self.limit_y_axis[1], self.limit_x_axis[1]+outer_wall_thick, self.limit_y_axis[1]+outer_wall_thick)) #outer wall
+        self.obstacles.append(box(self.limit_x_axis[1], self.limit_y_axis[0], self.limit_x_axis[1]+outer_wall_thick, self.limit_y_axis[1]+outer_wall_thick)) #outer wall
         
         self.obstacles.append(Polygon([(0,2.5),(-5,5),(5,5)]))
         self.obstacles.append(box(-12,13,-5,14))
@@ -127,44 +127,44 @@ class SimpleRobotEnv():
             for i in range(len(plot_data)):
                 plot_data[i].set_data(updated_data[i].exterior.xy)
         
-        if self.fig is None:
-            assert self.ax is None
-            self.fig, self.ax = plt.subplots()
-        if not self.ax.lines:
-            self.ax.plot([], [], "C0", linewidth=3)
+        if self.figure is None:
+            assert self.axes is None
+            self.figure, self.axes = plt.subplots()
+        if not self.axes.lines:
+            self.axes.plot([], [], "C0", linewidth=3)
             for _ in range(4):
-                self.ax.plot([], [], "C1", linewidth=3)
-            self.ax.plot([], [], "C2o", markersize=6)
+                self.axes.plot([], [], "C1", linewidth=3)
+            self.axes.plot([], [], "C2o", markersize=6)
 
-            self.ax.grid()
-            self.ax.set_xlim(self.xlim)
-            self.ax.set_aspect("equal")
-            self.ax.set_ylim(self.ylim)
+            self.axes.grid()
+            self.axes.set_xlim(self.limit_x_axis)
+            self.axes.set_aspect("equal")
+            self.axes.set_ylim(self.limit_y_axis)
         
             for obstacle in self.obstacles:
                 x,y = obstacle.exterior.xy
-                self.ax.plot(x, y)
+                self.axes.plot(x, y)
                 
             for body in self.robot.get_robot_body():
                 x,y = body.exterior.xy
-                self.ax.plot(x, y, 'k')
+                self.axes.plot(x, y, 'k')
             
             for sensor in self.robot.get_robot_sensors():
                 x,y = sensor.exterior.xy
-                self.ax.plot(x, y, 'silver')
+                self.axes.plot(x, y, 'silver')
                 
         # Retrieve robot's plot so it moves after initiated
         # This is to avoid redrawing the plot every cycle
         obstacle_idx = 6 + len(self.obstacles)
         robot_idx    = obstacle_idx + len(self.robot.get_robot_body())
         sensor_idx   = robot_idx + len(self.robot.get_robot_sensors())
-        robot_body   = self.ax.lines[obstacle_idx:robot_idx]
-        robot_sensor = self.ax.lines[robot_idx:sensor_idx]
+        robot_body   = self.axes.lines[obstacle_idx:robot_idx]
+        robot_sensor = self.axes.lines[robot_idx:sensor_idx]
         matching_plot(robot_body, self.robot.get_robot_body())
         matching_plot(robot_sensor, self.robot.get_robot_sensors())
         
-        self.ax.relim()
-        self.ax.autoscale_view()
+        self.axes.relim()
+        self.axes.autoscale_view()
         plt.draw()
         plt.pause(1e-07)
         if hold:
@@ -173,9 +173,9 @@ class SimpleRobotEnv():
 
     def get_random_position(self):
         # Generate a pre-defined target position where the robot can appear without colliding to any obstacle
-        target_n = np.random.randint(len(self.target_list))
-        pos_x = self.target_list[target_n][0]
-        pos_y = self.target_list[target_n][1]
+        selected_target = np.random.randint(len(self.target_list))
+        pos_x = self.target_list[selected_target][0]
+        pos_y = self.target_list[selected_target][1]
         phi   = np.random.uniform(-np.pi, np.pi)
         return pos_x, pos_y, phi
     
@@ -188,13 +188,13 @@ class SimpleRobotEnv():
     
     def get_state(self):
         # Get the state of the robot that contains:
-        # 1. list of Sensor readings with the size equals to robot.n_direction
+        # 1. list of Sensor readings with the size equals to robot.n_fov_zones
         # 2. the action taken by the robot (stored as the last two of the list member)
         self.render()
-        obstacle_distances = np.ones((self.robot.n_direction))*self.robot.camera_far_clipping
+        obstacle_distances = np.ones((self.robot.n_fov_zones))*self.robot.camera_far_clipping
         robot_center       = Point((self.robot.pos_x, self.robot.pos_y))
         for obstacle in self.obstacles:
-            for i in range(self.robot.n_direction):
+            for i in range(self.robot.n_fov_zones):
                 if obstacle.intersects(self.robot.robot_sensors[i]):
                     intersection_poylgon = obstacle.intersection(self.robot.robot_sensors[i])
                     obstacle_distances[i] = min(obstacle_distances[i], robot_center.distance(intersection_poylgon))
@@ -213,8 +213,8 @@ class SimpleRobotEnv():
         # It consider the closest distance of the obstacle
         # and multiply by the speed so risky dangerous situation is penalized more with faster speed 
         # and safe situation is rewarded more with faster speed
-        closest_distance = np.min(state[:self.robot.n_direction]) #get the closest distance from all sensors
-        robot_linear_speed = state[self.robot.n_direction]
+        closest_distance = np.min(state[:self.robot.n_fov_zones]) #get the closest distance from all sensors
+        robot_linear_speed = state[self.robot.n_fov_zones]
         if self.check_collision():
             reward = -1.0 * robot_linear_speed
         elif closest_distance >= self.robot.camera_far_clipping:
