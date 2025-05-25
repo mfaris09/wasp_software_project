@@ -12,7 +12,7 @@ of WASP Software Engineering and Cloud Computing.
 
 Clone or download the entire package:
 ```
-git clone https://github.com/mfaris0910/wasp_software_project.git
+git clone https://github.com/mfaris09/wasp_software_project.git
 cd wasp_software_project
 ```
 
